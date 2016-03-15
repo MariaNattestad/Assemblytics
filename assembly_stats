@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Author: Maria Nattestad
+# Email: mnattest@cshl.edu
+# This script is part of Assemblytics, a program to detect and analyze structural variants from an assembly aligned to a reference genome using MUMmer. 
+
+
+USAGE="assembly_stats coords_file"
+
+
+if [ -z "$1" ]
+  then
+    echo "ERROR in assembly_stats: No coords file given"
+    echo "Usage:"
+    echo $USAGE
+    exit
+fi
+
+
+COORDS=${1?"$USAGE"}
+
+
+cat $COORDS | awk '{print $12,$8}' OFS='\t' | sort -k2,2nr | uniq  > $COORDS.ref.genome
+cat $COORDS | awk '{print $13,$9}' OFS='\t' | sort -k2,2nr | uniq  > $COORDS.query.genome
+
+echo "Reference:"
+read REF_NUM_CONTIGS REF_ASSEMBLY_LENGTH REF_MEAN_LENGTH REF_MIN REF_MAX<<<$(awk '{if(min==""){min=max=previous=$2}; if($2>max){max=$2}; if($2<min){min=$2}; total+=$2; count+=1; previous=$2;} END {print count,total,total/count, min, max}' $COORDS.ref.genome)
+echo "Number of sequences: $REF_NUM_CONTIGS"
+echo "Total sequence length: $REF_ASSEMBLY_LENGTH"
+echo "Mean: $REF_MEAN_LENGTH"
+echo "Min: $REF_MIN"
+echo "Max: $REF_MAX"
+
+awk -v al=$REF_ASSEMBLY_LENGTH 'BEGIN{n50="not found"}{sum+=$2; if(sum>al/2 && n50=="not found"){n50=$2};}END{print "N50: "n50}' $COORDS.ref.genome
+
+
+
+echo "_______________________"
+echo ""
+echo "Query:"
+read QUERY_NUM_CONTIGS QUERY_ASSEMBLY_LENGTH QUERY_MEAN_LENGTH QUERY_MIN QUERY_MAX<<<$(awk '{if(min==""){min=max=previous=$2}; if($2>max){max=$2}; if($2<min){min=$2}; total+=$2; count+=1; previous=$2;} END {print count,total,total/count, min, max}' $COORDS.query.genome)
+echo "Number of sequences: $QUERY_NUM_CONTIGS"
+echo "Total sequence length: $QUERY_ASSEMBLY_LENGTH"
+echo "Mean: $QUERY_MEAN_LENGTH"
+echo "Min: $QUERY_MIN"
+echo "Max: $QUERY_MAX"
+
+awk -v al=$QUERY_ASSEMBLY_LENGTH 'BEGIN{n50="not found"}{sum+=$2; if(sum>al/2 && n50=="not found"){n50=$2};}END{print "N50: "n50}' $COORDS.query.genome
+
+
+
+
+
