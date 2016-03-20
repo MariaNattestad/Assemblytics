@@ -1,6 +1,7 @@
 # Assemblytics - an analytics tool for the detection and analysis of assembly-based variants
 
 Assemblytics is available online at http://qb.cshl.edu/assemblytics/
+Please cite our pre-print on the bioRxiv: http://biorxiv.org/content/early/2016/03/20/044925
 
 If you would like a stand-alone version (for instance to comply with rules preventing upload of data to a third-party website), this repository contains all the code for running Assemblytics yourself, from unique anchor filtering and calling variants to creating the output plots and summary tables. 
 
