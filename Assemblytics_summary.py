@@ -14,10 +14,13 @@ def SVtable(args):
     minimum_variant_size = args.minimum_variant_size
     maximum_variant_size = args.maximum_variant_size
     simplify_types = False 
+
+
     f=open(filename)
     typeList = []
     sizeList = []
     rawTypes = []
+    linecounter = 0
     for line in f:
         fields = line.strip().split()
         if not fields[4].isdigit():
@@ -34,6 +37,7 @@ def SVtable(args):
         else:
             typeList.append(svType)
         sizeList.append(int(fields[4]))
+        linecounter += 1
     f.close()
     
     size_thresholds = [10,50,100,1000,10000,50000,100000,500000,1000000]
@@ -51,38 +55,52 @@ def SVtable(args):
     SV_size = 50
 
     all_SV_types = svTypes + list(set(rawTypes)-set(svTypes))
-    for svType in all_SV_types:
-        sizes = sizeArray[typeArray==svType]
-        overall_total += len(sizes)
-        overall_total_bases += sum(sizes)
-        overall_total_SVs += len(sizes[sizes>=SV_size])
-        overall_total_SV_bases += sum(sizes[sizes>=SV_size])
-        print svType
-        
-        format = "%20s%10s%15s"
 
-        print format % ("", "Count","Total bp")
-        previous_size = minimum_variant_size
-        for threshold in size_thresholds:
-            if threshold <= minimum_variant_size or previous_size >= maximum_variant_size:
-                continue
-            subset = sizes[np.logical_and(sizes>=previous_size,sizes<threshold)]; 
-            print format % ("%s-%s bp: " % (intWithCommas(previous_size),intWithCommas(threshold)), str(len(subset)), str(sum(subset)))
-            previous_size = threshold
+    f_output_csv = open(filename[0:-4]+".summary.csv",'w')
 
-        if previous_size < maximum_variant_size:
-            subset = sizes[sizes>=previous_size];    
-            print format % ("> %s bp: " % (intWithCommas(previous_size)), str(len(subset)), str(sum(subset)))
+    if linecounter > 0:
+        for svType in all_SV_types:
+            sizes = sizeArray[typeArray==svType]
+            overall_total += len(sizes)
+            overall_total_bases += sum(sizes)
+            overall_total_SVs += len(sizes[sizes>=SV_size])
+            overall_total_SV_bases += sum(sizes[sizes>=SV_size])
+            print svType
+            f_output_csv.write(svType + "\n")
+            
+            format = "%20s%10s%15s"
 
-        print format % ("Total: ",str(len(sizes)),str(sum(sizes))) + "\n"
-        
+            print format % ("", "Count","Total bp")
+            f_output_csv.write("Size range,Count,Total bp\n")
+
+            previous_size = minimum_variant_size
+            for threshold in size_thresholds:
+                if threshold <= minimum_variant_size or previous_size >= maximum_variant_size:
+                    continue
+                subset = sizes[np.logical_and(sizes>=previous_size,sizes<threshold)]; 
+                print format % ("%s-%s bp: " % (intWithCommas(previous_size),intWithCommas(threshold)), str(len(subset)), str(sum(subset)))
+                f_output_csv.write("%s,%s,%s\n" % ("%s-%s bp" % (previous_size,threshold), str(len(subset)), str(sum(subset))))
+                previous_size = threshold
+
+            if previous_size < maximum_variant_size:
+                subset = sizes[sizes>=previous_size];    
+                print format % ("> %s bp: " % (intWithCommas(previous_size)), str(len(subset)), str(sum(subset)))
+                f_output_csv.write("%s,%s,%s\n" % ("> %s bp" % (previous_size), str(len(subset)), str(sum(subset))))
+
+            print format % ("Total: ",str(len(sizes)),str(sum(sizes))) + "\n"
+            f_output_csv.write("%s,%s,%s\n\n" % ("Total",str(len(sizes)),str(sum(sizes))))
+    else:
+        print "No variants found. Plots depicting variant size distributions will also be missing.\n"
 
     print "Total number of all variants: %s" % (intWithCommas(overall_total))
+    f_output_csv.write("Total for all variants,%s,%s bp\n" % (overall_total,int(overall_total_bases)))
     print "Total bases affected by all variants: %s bp" % (intWithCommas(int(overall_total_bases)))
 
     print "Total number of structural variants: %s" % (intWithCommas(overall_total_SVs))
+    f_output_csv.write("Total for all structural variants,%s,%s bp\n" % (overall_total_SVs,int(overall_total_SV_bases))  )
     print "Total bases affected by structural variants: %s bp" % (intWithCommas(int(overall_total_SV_bases)))
 
+    f_output_csv.close()
 
 def intWithCommas(x):
     if type(x) not in [type(0), type(0L)]:

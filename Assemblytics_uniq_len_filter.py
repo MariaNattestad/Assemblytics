@@ -25,7 +25,6 @@ def run(args):
 
     linecounter = 0
 
-
     current_query_name = ""
     current_header = ""
 
@@ -37,8 +36,7 @@ def run(args):
     for line in f:
         if line[0]==">":
             linecounter += 1
-            # if linecounter > 3:
-            #     break
+
             fields = line.strip().split()
             current_query_name = fields[1]
             current_header = line.strip()
@@ -69,7 +67,6 @@ def run(args):
         alignments_to_keep[query] = summarize(lines_by_query[query], unique_length_required = unique_length)
         query_counter += 1
         if (query_counter % num_query_step_to_report) == 0:
-            # print query_counter, num_queries
             print "Progress: %d%%" % (query_counter*100/num_queries)
     print "Progress: 100%"
 
@@ -92,10 +89,8 @@ def run(args):
         if line[0]==">":
             fields = line.strip().split()
             query = fields[1]
-            # print query # TESTING
             list_of_alignments_to_keep = alignments_to_keep[query]
-            # print "-----------> ", line.strip()
-            # print list_of_alignments_to_keep
+
             header_needed = False
             for index in list_of_alignments_to_keep:
                 if line.strip() == header_lines_by_query[query][index]:
@@ -125,14 +120,12 @@ def summarize(lines, unique_length_required):
     if len(lines)==0:
         return alignments_to_keep
 
-    ################### NEW, TESTING #########################
     if len(lines) == 1:
         fields = lines[0].strip().split()
         query_start = int(fields[2])
         query_end = int(fields[3])
         if abs(int(fields[3])-int(fields[2])) >= unique_length_required:
-            return [0] # return the first line
-    ##########################################################
+            return [0]
 
     starts_and_stops = []
     tags = []
@@ -182,8 +175,7 @@ def summarize(lines, unique_length_required):
         if total_unique_length > unique_length_required:
             alignments_to_keep.append(line_counter)
         line_counter += 1
-    # print "Going through all the %d intervals: %d seconds. --- intervals per second: %0.2f" % (line_counter, time.time()-before, line_counter/(time.time()-before))
-    # print line_counter,time.time()-before
+
 
     return alignments_to_keep
 
