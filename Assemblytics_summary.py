@@ -6,7 +6,6 @@
 # This script is part of Assemblytics, a program to detect and analyze structural variants from an assembly aligned to a reference genome using MUMmer. 
 
 
-
 import argparse
 import numpy as np
 
@@ -14,7 +13,7 @@ def SVtable(args):
     filename = args.file
     minimum_variant_size = args.minimum_variant_size
     maximum_variant_size = args.maximum_variant_size
-    simplify_types = False #args.simplify
+    simplify_types = False 
     f=open(filename)
     typeList = []
     sizeList = []
@@ -41,9 +40,9 @@ def SVtable(args):
 
     sizeArray = np.array(sizeList)
     typeArray = np.array(typeList)
-    svTypes = ["Insertion","Deletion","Tandem_expansion","Tandem_contraction","Repeat_expansion","Repeat_contraction"] #,"Substitution", "Longrange", "Interchromosomal"]
+    svTypes = ["Insertion","Deletion","Tandem_expansion","Tandem_contraction","Repeat_expansion","Repeat_contraction"]
     if simplify_types == True:
-        svTypes = ["Insertion/Expansion","Deletion/Contraction"] #,"Substitution", "Longrange", "Interchromosomal"]
+        svTypes = ["Insertion/Expansion","Deletion/Contraction"]
     overall_total = 0
     overall_total_bases = 0
     overall_total_SVs = 0
@@ -74,29 +73,9 @@ def SVtable(args):
         if previous_size < maximum_variant_size:
             subset = sizes[sizes>=previous_size];    
             print format % ("> %s bp: " % (intWithCommas(previous_size)), str(len(subset)), str(sum(subset)))
-            # print "\t> %s bp: \t\t" % (intWithCommas(previous_size)), len(subset), "\t\t", sum(subset)
 
-        # subset = sizes[sizes<50];                              print "\t1-49 bp: \t\t", len(subset), "\t\t", sum(subset)
-        # subset = sizes[np.logical_and(sizes>=50,sizes<100)];    print "\t50-99 bp: \t\t", len(subset),"\t\t", sum(subset)
-        # subset = sizes[np.logical_and(sizes>=100,sizes<1000)];    print "\t100-999 bp: \t\t", len(subset),"\t\t", sum(subset)
-        # subset = sizes[np.logical_and(sizes>=1000,sizes<10000)];    print "\t1000-9,999 bp: \t\t", len(subset), "\t\t", sum(subset)
-        # subset = sizes[sizes>=10000];    print "\t> 10,000 bp: \t\t", len(subset), "\t\t", sum(subset)
         print format % ("Total: ",str(len(sizes)),str(sum(sizes))) + "\n"
         
-   
-    # for svType in list(set(rawTypes)-set(svTypes)):
-    #     sizes = sizeArray[typeArray==svType]
-    #     overall_total += len(sizes)
-    #     overall_total_bases += sum(sizes)
-    #     print svType
-    #     print "\t\t\t\tCount\t\tTotal bp"
-    #     subset = sizes[sizes<50];                              print "\t1-49 bp: \t\t", len(subset), "\t\t", sum(subset)
-    #     subset = sizes[np.logical_and(sizes>=50,sizes<=100)];    print "\t50-99 bp: \t\t", len(subset),"\t\t", sum(subset)
-    #     subset = sizes[np.logical_and(sizes>=100,sizes<1000)];    print "\t100-999 bp: \t\t", len(subset),"\t\t", sum(subset)
-    #     subset = sizes[np.logical_and(sizes>=1000,sizes<10000)];    print "\t1000-9,999 bp: \t\t", len(subset), "\t\t", sum(subset)
-    #     subset = sizes[sizes>=10000];    print "\t> 10,000 bp: \t\t", len(subset), "\t\t", sum(subset)
-    #     print "\tTotal: \t\t\t", len(sizes), "\t\t", sum(sizes)
-    #     print "\n"
 
     print "Total number of all variants: %s" % (intWithCommas(overall_total))
     print "Total bases affected by all variants: %s bp" % (intWithCommas(int(overall_total_bases)))
@@ -117,12 +96,11 @@ def intWithCommas(x):
     return "%d%s" % (x, result)
 
 def main():
-    parser=argparse.ArgumentParser(description='Output a summary table of variants from assembly-based variant-calling with mummer and svfinder',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-i',help='bed file produced by svfinder.pl script',dest='file',type=str,required=True)
+    parser=argparse.ArgumentParser(description='Output a summary table of variants from Assemblytics',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-i',help='bed file of variants from Assemblytics',dest='file',type=str,required=True)
     parser.add_argument('-min',help='minimum variant size',dest='minimum_variant_size',type=int,required=True)
     parser.add_argument('-max',help='maximum variant size',dest='maximum_variant_size',type=int,required=True)
 
-    # parser.add_argument('-simplify',help='Lump together Insertion/Expansion and Deletion/Contraction',dest='simplify',action='store_true')
     args=parser.parse_args()
     SVtable(args)
     

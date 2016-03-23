@@ -189,7 +189,7 @@ def summarize(lines, unique_length_required):
 
 
 def main():
-    parser=argparse.ArgumentParser(description="Outputs MUMmer coordinates annotated with length of unique sequence for each alignment")
+    parser=argparse.ArgumentParser(description="Filters alignments in delta file based whether each alignment has a unique sequence anchoring it")
     parser.add_argument("--delta",help="delta file" ,dest="delta", type=str, required=True)
     parser.add_argument("--out",help="output file" ,dest="out", type=str, required=True)
     parser.add_argument("--unique-length",help="The total length of unique sequence an alignment must have on the query side to be retained. Default: 10000" ,dest="unique_length",type=int, default=10000)
