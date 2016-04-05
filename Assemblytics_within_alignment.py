@@ -38,9 +38,11 @@ def run(args):
         else:
             fields = line.strip().split()
             if len(fields) > 4:
-                current_reference_position = int(fields[0])
+                # current_reference_position = int(fields[0])
+                current_reference_position = min(int(fields[0]),int(fields[1]))
                 # fields[1] is the reference position at the end of the alignment
-                current_query_position = int(fields[2])
+                # current_query_position = int(fields[2])
+                current_query_position = min(int(fields[2]),int(fields[3]))
                 # fields[3] is the query position at the end of the alignment
             else:
                 tick = int(fields[0])
@@ -70,6 +72,9 @@ def run(args):
                         report = [current_reference_name,current_reference_position,current_reference_position,"Assemblytics_w_"+str(len(variants)+1),size,"+","Insertion",0,size,current_query_name,"within_alignment",current_query_position,current_query_position+size]
                         current_query_position += size # update query position after insertion
                         variants.append(report)
+                # TESTING
+                # print line, report
+                
 
     f.close()
 
