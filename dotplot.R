@@ -1,10 +1,3 @@
-# Author: Maria Nattestad
-# Email: mnattest@cshl.edu
-# This script is part of Assemblytics, a program to detect and analyze structural variants from an assembly aligned to a reference genome using MUMmer. 
-
-
-
-
 library(ggplot2)
 
 
@@ -15,13 +8,13 @@ prefix <- args[1]
 
 for (filtered in c("Assemblytics filtered","Unfiltered")) {
     filename <- paste(prefix,".coords.flipped",sep="")
-    plot.output.filename <- paste(prefix,".Assemblytics.dotplot.png",sep="")
+    plot.output.filename <- paste(prefix,".Assemblytics.Dotplot_filtered.png",sep="")
     plot.title <- "Dot plot of Assemblytics filtered alignments"
 
 
     if (filtered == "Unfiltered") {
         filename <- paste(prefix,".unfiltered.coords.flipped",sep="")
-        plot.output.filename <- paste(prefix,".Assemblytics.unfiltered_dotplot.png",sep="")
+        plot.output.filename <- paste(prefix,".Assemblytics.Dotplot_unfiltered.png",sep="")
         plot.title <- "Dot plot of unfiltered alignments"
     }
 
@@ -46,7 +39,6 @@ for (filtered in c("Assemblytics filtered","Unfiltered")) {
     coords <- read.csv(filename,sep="\t",header=FALSE)
 
     names(coords) <- c("ref.start", "ref.stop","query.start","query.stop","ref.alignment.length","query.alignment.length","percent.identity","ref.length","query.length","ref.fraction.covered","query.fraction.covered","ref","query")
-   
 
 
     coords$ref <- as.character(coords$ref)
@@ -71,10 +63,8 @@ for (filtered in c("Assemblytics filtered","Unfiltered")) {
     coords <- cbind(coords, alignment.length=abs(coords$query.start-coords$query.stop))
 
 
-
     coords <- cbind(coords, ref.loc.start=mapply(FUN=ref.pos,coords$ref,coords$ref.start,MoreArgs=list(chr.lengths)),
                     ref.loc.stop=mapply(FUN=ref.pos,coords$ref,coords$ref.stop,MoreArgs=list(chr.lengths)))
-
 
     # pick longest alignment. then pick the ref.loc.start of that
     query.group <- split(coords,factor(coords$query))
@@ -82,7 +72,7 @@ for (filtered in c("Assemblytics filtered","Unfiltered")) {
     ref.loc.of.longest.alignment.by.query <- unlist(sapply(query.group, function(coords.for.each.query) {coords.for.each.query$ref.loc.start[coords.for.each.query$alignment.length==max(coords.for.each.query$alignment.length)][1]}),recursive=FALSE)
 
 
-    # decide best ordering of the queries according to each of their longest alignments
+    # decide optimal-ish ordering of the queries
     ordered.query.names <- names(ref.loc.of.longest.alignment.by.query)[order(ref.loc.of.longest.alignment.by.query)]
 
     # construct a query.lengths list
