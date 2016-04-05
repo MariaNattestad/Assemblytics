@@ -72,9 +72,6 @@ def run(args):
                         report = [current_reference_name,current_reference_position,current_reference_position,"Assemblytics_w_"+str(len(variants)+1),size,"+","Insertion",0,size,current_query_name,"within_alignment",current_query_position,current_query_position+size]
                         current_query_position += size # update query position after insertion
                         variants.append(report)
-                # TESTING
-                # print line, report
-                
 
     f.close()
 

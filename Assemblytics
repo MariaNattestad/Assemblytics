@@ -48,7 +48,7 @@ PATH_TO_R_SCRIPTS=${4?"$USAGE"}
 >&2 echo Unique anchor length: $UNIQUE_LENGTH
 >&2 echo Path to R scripts: $PATH_TO_R_SCRIPTS
 
-MINIMUM_SIZE=5
+MINIMUM_SIZE=2
 MAXIMUM_SIZE=$UNIQUE_LENGTH
 
 LOG_FILE=$OUTPUT_PREFIX.progress.log
@@ -78,18 +78,17 @@ then
             then 
                 echo "WITHIN,DONE,Step 4: Assemblytics_within_alignment.py completed successfully" >> $LOG_FILE
                 >&2 echo "4. Combine variants between and within alignments";
-                HEADER="reference   ref_start   ref_stop    ID  size    strand  type    ref_gap_size    query_gap_size  query_coordinates   method"
-                cat <(echo $HEADER) $OUTPUT_PREFIX.variants_within_alignments.bed $OUTPUT_PREFIX.variants_between_alignments.bed > $OUTPUT_PREFIX.Assemblytics_structural_variants.bed
+                HEADER="reference\tref_start\tref_stop\tID\tsize\tstrand\ttype\tref_gap_size\tquery_gap_size\tquery_coordinates\tmethod"
+                cat <(echo -e $HEADER) $OUTPUT_PREFIX.variants_within_alignments.bed $OUTPUT_PREFIX.variants_between_alignments.bed > $OUTPUT_PREFIX.Assemblytics_structural_variants.bed
 
                 if grep -q "Assemblytics" $OUTPUT_PREFIX.Assemblytics_structural_variants.bed; 
                 then 
                     echo "COMBINE,DONE,Step 5: Variants combined successfully" >> $LOG_FILE
 
-                    Rscript $PATH_TO_R_SCRIPTS/size_distributions.R $OUTPUT_PREFIX
+                    Rscript $PATH_TO_R_SCRIPTS/size_distributions.R $OUTPUT_PREFIX $MINIMUM_SIZE $MAXIMUM_SIZE
 
                     show-coords -rclTH $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta > $OUTPUT_PREFIX.coords
                     show-coords -rclTH $OUTPUT_PREFIX.l$UNIQUE_LENGTH.delta > $OUTPUT_PREFIX.unfiltered.coords
-
 
                     assembly_stats $OUTPUT_PREFIX.coords > $OUTPUT_PREFIX.Assemblytics_assembly_stats.txt
 
@@ -102,7 +101,6 @@ then
                     Rscript $PATH_TO_R_SCRIPTS/assembly_Nchart.R $OUTPUT_PREFIX
                     
                     Assemblytics_summary.py -i $OUTPUT_PREFIX.Assemblytics_structural_variants.bed -min $MINIMUM_SIZE -max $MAXIMUM_SIZE > $OUTPUT_PREFIX.Assemblytics_structural_variants.summary
-
 
                     if grep -q "Total" $OUTPUT_PREFIX.Assemblytics_structural_variants.summary; 
                     then
@@ -127,3 +125,4 @@ else
     echo "DELTAFILTER,FAIL,Step 1: delta-filter failed: Not a real delta file." >> $LOG_FILE
 fi
 
+echo "Check $OUTPUT_PREFIX.progress.log for errors."

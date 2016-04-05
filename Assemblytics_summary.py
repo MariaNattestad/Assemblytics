@@ -40,7 +40,7 @@ def SVtable(args):
         linecounter += 1
     f.close()
     
-    size_thresholds = [10,50,100,1000,10000,50000,100000,500000,1000000]
+    size_thresholds = [10,50,500,10000,50000,100000,500000,1000000]
 
     sizeArray = np.array(sizeList)
     typeArray = np.array(typeList)
