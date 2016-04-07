@@ -28,9 +28,10 @@ bed$type <- factor(bed$type, levels = types.allowed)
 theme_set(theme_bw(base_size = 12))
 
 
-# library(RColorBrewer)
+library(RColorBrewer)
 # display.brewer.all()
 color_palette_name <- "Set1"
+big_palette<-brewer.pal(9,"Set1")[c(1,2,3,4,5,7)]
 
 # Nature-style formatting for publication using commas (e.g.: 7,654,321)
 comma_format<-function(num) {
@@ -56,7 +57,8 @@ plot_size_distribution <- function(min_var,max_var,indels_only) {
         print(ggplot(filtered_bed,aes(x=size, fill=type)) + 
           geom_bar(binwidth=binwidth) + 
           
-          scale_fill_brewer(palette=color_palette_name,drop=FALSE) + 
+#           scale_fill_brewer(palette=color_palette_name,drop=FALSE) + 
+          scale_fill_manual(values=big_palette,drop=FALSE) + 
           facet_grid(type ~ .,drop=FALSE) + 
           labs(fill="Variant type",x="Variant size",y="Count",title=paste("Variants",comma_format(min_var),"to", comma_format(max_var),"bp")) + 
                   scale_x_continuous(labels=comma_format,expand=c(0,0),limits=c(min_var,max_var)) +
