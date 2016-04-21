@@ -48,7 +48,7 @@ PATH_TO_R_SCRIPTS=${4?"$USAGE"}
 >&2 echo Unique anchor length: $UNIQUE_LENGTH
 >&2 echo Path to R scripts: $PATH_TO_R_SCRIPTS
 
-MINIMUM_SIZE=2
+MINIMUM_SIZE=1
 MAXIMUM_SIZE=$UNIQUE_LENGTH
 
 LOG_FILE=$OUTPUT_PREFIX.progress.log
