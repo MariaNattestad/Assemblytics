@@ -16,3 +16,4 @@ Assemblytics delta_file output_prefix unique_anchor_length path_to_R_scripts
 
 ```
 
+Important: Use only contigs rather than scaffolds from the assembly. This will prevent false positives when the number of Ns in the scaffolded sequence does not match perfectly to the distance in the reference.
