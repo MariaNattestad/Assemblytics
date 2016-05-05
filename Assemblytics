@@ -81,9 +81,9 @@ then
                 HEADER="reference\tref_start\tref_stop\tID\tsize\tstrand\ttype\tref_gap_size\tquery_gap_size\tquery_coordinates\tmethod"
                 cat <(echo -e $HEADER) $OUTPUT_PREFIX.variants_within_alignments.bed $OUTPUT_PREFIX.variants_between_alignments.bed > $OUTPUT_PREFIX.Assemblytics_structural_variants.bed
 
-                if grep -q "Assemblytics" $OUTPUT_PREFIX.Assemblytics_structural_variants.bed; 
+                if [ -e $OUTPUT_PREFIX.Assemblytics_structural_variants.bed ];
                 then
-                    echo "COMBINE,DONE,Step 5: Variants combined successfully" >> $LOG_FILE
+                    echo "COMBINE,DONE,Step 5: Variants combined successfully. Now generating figures." >> $LOG_FILE
 
                     Rscript $PATH_TO_R_SCRIPTS/size_distributions.R $OUTPUT_PREFIX $MINIMUM_SIZE $MAXIMUM_SIZE
 
@@ -95,7 +95,6 @@ then
                     flip_query_coords.py --coords $OUTPUT_PREFIX.coords > $OUTPUT_PREFIX.coords.flipped
                     flip_query_coords.py --coords $OUTPUT_PREFIX.unfiltered.coords > $OUTPUT_PREFIX.unfiltered.coords.flipped
 
-                    echo "Done flipping"
                     Rscript $PATH_TO_R_SCRIPTS/dotplot.R $OUTPUT_PREFIX
                     
                     Rscript $PATH_TO_R_SCRIPTS/assembly_Nchart.R $OUTPUT_PREFIX
