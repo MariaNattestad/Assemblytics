@@ -8,13 +8,13 @@ prefix <- args[1]
 
 for (filtered in c("Assemblytics filtered","Unfiltered")) {
     filename <- paste(prefix,".coords.flipped",sep="")
-    plot.output.filename <- paste(prefix,".Assemblytics.Dotplot_filtered.png",sep="")
+    plot.output.filename <- paste(prefix,".Assemblytics.Dotplot_filtered",sep="")
     plot.title <- "Dot plot of Assemblytics filtered alignments"
 
 
     if (filtered == "Unfiltered") {
         filename <- paste(prefix,".unfiltered.coords.flipped",sep="")
-        plot.output.filename <- paste(prefix,".Assemblytics.Dotplot_unfiltered.png",sep="")
+        plot.output.filename <- paste(prefix,".Assemblytics.Dotplot_unfiltered",sep="")
         plot.title <- "Dot plot of unfiltered alignments"
     }
 
@@ -94,12 +94,11 @@ for (filtered in c("Assemblytics filtered","Unfiltered")) {
     query.labels[query.lengths < 0.02*sum(as.numeric(query.lengths))] <- ""
 
 
-    png(file=plot.output.filename,width=1000,height=1000)
-
-
     theme_set(theme_bw(base_size = 24))
-    # 1 line segment for each alignment, linking start and stop
-    # some kind of gridline on plot to show where contigs start and end
+
+
+    #  CREATE PNG
+    png(file=paste(plot.output.filename, ".png",sep=""),width=1000,height=1000)    
     print(ggplot(coords, aes(x=ref.loc.start,xend=ref.loc.stop,y=query.loc.start,yend=query.loc.stop)) + geom_segment(lineend="butt",size=1.5) + labs(x="Reference",y="Query",title=plot.title) + scale_y_continuous(breaks = cumsum(as.numeric(query.lengths)),labels=query.labels,expand=c(0,0), limits = c(0,sum(as.numeric(query.lengths)))) + scale_x_continuous(breaks = cumsum(as.numeric(chr.lengths)),labels=chr.labels,expand=c(0,0),limits=c(0,sum(as.numeric(chr.lengths)))) + theme(
         axis.ticks.y=element_line(size=0),
         axis.text.x = element_text(angle = 90, hjust = 1,vjust=-0.5),
@@ -111,6 +110,21 @@ for (filtered in c("Assemblytics filtered","Unfiltered")) {
     ))
 
     dev.off()
+
+    #  CREATE PDF
+    pdf(file=paste(plot.output.filename, ".pdf",sep=""),width=1000,height=1000)
+    print(ggplot(coords, aes(x=ref.loc.start,xend=ref.loc.stop,y=query.loc.start,yend=query.loc.stop)) + geom_segment(lineend="butt",size=1.5) + labs(x="Reference",y="Query",title=plot.title) + scale_y_continuous(breaks = cumsum(as.numeric(query.lengths)),labels=query.labels,expand=c(0,0), limits = c(0,sum(as.numeric(query.lengths)))) + scale_x_continuous(breaks = cumsum(as.numeric(chr.lengths)),labels=chr.labels,expand=c(0,0),limits=c(0,sum(as.numeric(chr.lengths)))) + theme(
+        axis.ticks.y=element_line(size=0),
+        axis.text.x = element_text(angle = 90, hjust = 1,vjust=-0.5),
+        axis.text.y = element_text(size=12,vjust=1.1),
+        plot.title = element_text(vjust=3),
+        panel.grid.major.x = element_line(colour = "black",size=0.1), 
+        panel.grid.major.y = element_line(colour = "black",size=0.1), 
+        panel.grid.minor = element_line(NA)
+    ))
+
+    dev.off()
+
 
 }
 
