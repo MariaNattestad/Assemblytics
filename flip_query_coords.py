@@ -28,16 +28,16 @@ def run(args):
     flip_by_query = {}
     for query_name in fields_by_query:
         lines = fields_by_query[query_name]
-        longest_alignment_flip = False
-        longest_alignment_length = 0
+        sum_forward = 0
+        sum_reverse = 0
         for fields in lines:
-            alignment_length = fields[5]
-            if alignment_length > longest_alignment_length:
-                longest_alignment_length = alignment_length
-                query_stop = int(fields[3])
-                query_start = int(fields[2])
-                longest_alignment_flip = query_stop < query_start
-        flip_by_query[query_name] = longest_alignment_flip
+            query_stop = int(fields[3])
+            query_start = int(fields[2])
+            if query_stop < query_start:
+                sum_reverse += int(fields[5]) # add alignment length
+            else:
+                sum_forward += int(fields[5])
+        flip_by_query[query_name] = sum_reverse > sum_forward
 
     f = open(coords)
     for line in f:
@@ -49,6 +49,7 @@ def run(args):
 
         print "\t".join(fields)
 
+    f.close()
 
 
 def main():
