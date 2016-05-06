@@ -36,7 +36,6 @@ if [ -z "$4" ]
 fi
 
 
-
 DELTA=${1?"$USAGE"}
 OUTPUT_PREFIX=${2?"$USAGE"}
 UNIQUE_LENGTH=${3?"$USAGE"}
@@ -51,77 +50,67 @@ PATH_TO_R_SCRIPTS=${4?"$USAGE"}
 MINIMUM_SIZE=1
 MAXIMUM_SIZE=$UNIQUE_LENGTH
 
-LOG_FILE=$OUTPUT_PREFIX.progress.log
 
-echo "${OUTPUT_PREFIX##*/}" > $LOG_FILE
+echo "STARTING,DONE,Starting unique anchor filtering." 
 
 >&2 echo "1. Filter delta file"
-delta-filter -l $UNIQUE_LENGTH $DELTA > $OUTPUT_PREFIX.l$UNIQUE_LENGTH.delta
+Assemblytics_uniq_len_filter.py --delta $DELTA --unique-length $UNIQUE_LENGTH --out $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta
+if grep -q ">" $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta;
+then 
+    echo "UNIQFILTER,DONE,Step 1: Assemblytics_uniq_len_filter.py completed successfully. Now finding variants between alignments." 
+    >&2 echo "2. Finding variants between alignments"
+    Assemblytics_between_alignments.pl  $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta $MINIMUM_SIZE $MAXIMUM_SIZE all-chromosomes exclude-longrange bed > $OUTPUT_PREFIX.variants_between_alignments.bed
 
-if grep -q ">" $OUTPUT_PREFIX.l$UNIQUE_LENGTH.delta; 
-then
-    echo "DELTAFILTER,DONE,Step 1: delta-filter completed successfully" >> $LOG_FILE
-    Assemblytics_uniq_len_filter.py --delta $OUTPUT_PREFIX.l$UNIQUE_LENGTH.delta --unique-length $UNIQUE_LENGTH --out $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta
-    if grep -q ">" $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta;
-    then 
-        echo "UNIQFILTER,DONE,Step 2: Assemblytics_uniq_len_filter.py completed successfully" >> $LOG_FILE
-        >&2 echo "2. Finding variants between alignments"
-        Assemblytics_between_alignments.pl  $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta $MINIMUM_SIZE $MAXIMUM_SIZE all-chromosomes exclude-longrange bed > $OUTPUT_PREFIX.variants_between_alignments.bed
+    if [ -e $OUTPUT_PREFIX.variants_between_alignments.bed ];
+    then
+        echo "BETWEEN,DONE,Step 2: Assemblytics_between_alignments.pl completed successfully. Now finding variants within alignments."
+        >&2 echo "3. Finding variants within alignments"
+        Assemblytics_within_alignment.py --delta $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta --min $MINIMUM_SIZE > $OUTPUT_PREFIX.variants_within_alignments.bed
 
-        if [ -e $OUTPUT_PREFIX.variants_between_alignments.bed ];
+        if [ -e $OUTPUT_PREFIX.variants_within_alignments.bed ];
         then 
-            echo "BETWEEN,DONE,Step 3: Assemblytics_between_alignments.pl completed successfully" >> $LOG_FILE
-            >&2 echo "3. Finding variants within alignments"
-            Assemblytics_within_alignment.py --delta $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta --min $MINIMUM_SIZE > $OUTPUT_PREFIX.variants_within_alignments.bed
+            echo "WITHIN,DONE,Step 3: Assemblytics_within_alignment.py completed successfully. Combining the two sets of variants together."
+            >&2 echo "4. Combine variants between and within alignments";
+            HEADER="reference\tref_start\tref_stop\tID\tsize\tstrand\ttype\tref_gap_size\tquery_gap_size\tquery_coordinates\tmethod"
+            cat <(echo -e $HEADER) $OUTPUT_PREFIX.variants_within_alignments.bed $OUTPUT_PREFIX.variants_between_alignments.bed > $OUTPUT_PREFIX.Assemblytics_structural_variants.bed
 
-            if [ -e $OUTPUT_PREFIX.variants_within_alignments.bed ];
+            if [ -e $OUTPUT_PREFIX.Assemblytics_structural_variants.bed ];
             then 
-                echo "WITHIN,DONE,Step 4: Assemblytics_within_alignment.py completed successfully" >> $LOG_FILE
-                >&2 echo "4. Combine variants between and within alignments";
-                HEADER="reference\tref_start\tref_stop\tID\tsize\tstrand\ttype\tref_gap_size\tquery_gap_size\tquery_coordinates\tmethod"
-                cat <(echo -e $HEADER) $OUTPUT_PREFIX.variants_within_alignments.bed $OUTPUT_PREFIX.variants_between_alignments.bed > $OUTPUT_PREFIX.Assemblytics_structural_variants.bed
-
-                if [ -e $OUTPUT_PREFIX.Assemblytics_structural_variants.bed ];
-                then
-                    echo "COMBINE,DONE,Step 5: Variants combined successfully. Now generating figures." >> $LOG_FILE
-
-                    Rscript $PATH_TO_R_SCRIPTS/size_distributions.R $OUTPUT_PREFIX $MINIMUM_SIZE $MAXIMUM_SIZE
-
-                    show-coords -rclTH $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta > $OUTPUT_PREFIX.coords
-                    show-coords -rclTH $OUTPUT_PREFIX.l$UNIQUE_LENGTH.delta > $OUTPUT_PREFIX.unfiltered.coords
-
-                    assembly_stats $OUTPUT_PREFIX.coords > $OUTPUT_PREFIX.Assemblytics_assembly_stats.txt
-
-                    flip_query_coords.py --coords $OUTPUT_PREFIX.coords > $OUTPUT_PREFIX.coords.flipped
-                    flip_query_coords.py --coords $OUTPUT_PREFIX.unfiltered.coords > $OUTPUT_PREFIX.unfiltered.coords.flipped
-
-                    Rscript $PATH_TO_R_SCRIPTS/dotplot.R $OUTPUT_PREFIX
-                    
-                    Rscript $PATH_TO_R_SCRIPTS/assembly_Nchart.R $OUTPUT_PREFIX
-                    
-                    Assemblytics_summary.py -i $OUTPUT_PREFIX.Assemblytics_structural_variants.bed -min $MINIMUM_SIZE -max $MAXIMUM_SIZE > $OUTPUT_PREFIX.Assemblytics_structural_variants.summary
-
-                    if grep -q "Total" $OUTPUT_PREFIX.Assemblytics_structural_variants.summary; 
-                    then
-                        echo "SUMMARY,DONE,Step 7: Assemblytics_summary.py completed successfully" >> $LOG_FILE
-                    else
-                        echo "SUMMARY,FAIL,Step 7: Assemblytics_summary.py failed" >> $LOG_FILE
-                    fi
+                echo "COMBINE,DONE,Step 4: Variants combined successfully. Generating figures and summary statistics."
                 
+                Rscript $PATH_TO_R_SCRIPTS/size_distributions.R $OUTPUT_PREFIX $MINIMUM_SIZE $MAXIMUM_SIZE
+
+                show-coords -rclTH $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta > $OUTPUT_PREFIX.coords
+                show-coords -rclTH $OUTPUT_PREFIX.l$UNIQUE_LENGTH.delta > $OUTPUT_PREFIX.unfiltered.coords
+
+
+                assembly_stats $OUTPUT_PREFIX.coords > $OUTPUT_PREFIX.Assemblytics_assembly_stats.txt
+
+                flip_query_coords.py --coords $OUTPUT_PREFIX.coords > $OUTPUT_PREFIX.coords.flipped
+                flip_query_coords.py --coords $OUTPUT_PREFIX.unfiltered.coords > $OUTPUT_PREFIX.unfiltered.coords.flipped
+
+                Rscript $PATH_TO_R_SCRIPTS/dotplot.R $OUTPUT_PREFIX
+                
+                Rscript $PATH_TO_R_SCRIPTS/assembly_Nchart.R $OUTPUT_PREFIX
+                
+                Assemblytics_summary.py -i $OUTPUT_PREFIX.Assemblytics_structural_variants.bed -min $MINIMUM_SIZE -max $MAXIMUM_SIZE > $OUTPUT_PREFIX.Assemblytics_structural_variants.summary
+
+                if grep -q "Total" $OUTPUT_PREFIX.Assemblytics_structural_variants.summary; 
+                then
+                    echo "SUMMARY,DONE,Step 5: Assemblytics_summary.py completed successfully" 
                 else
-                    echo "COMBINE,FAIL,Step 5: cat failed" >> $LOG_FILE
+                    echo "SUMMARY,FAIL,Step 5: Assemblytics_summary.py failed" 
                 fi
+            
             else
-                echo "WITHIN,FAIL,Step 4: Assemblytics_within_alignment.py failed: Possible problem before this step or with Python on server" >> $LOG_FILE
+                echo "COMBINE,FAIL,Step 4: combining variants failed" 
             fi
         else
-            echo "BETWEEN,FAIL,Step 3: Assemblytics_between_alignments.pl failed: Possible problem with Perl or show-coords on server." >> $LOG_FILE
+            echo "WITHIN,FAIL,Step 3: Assemblytics_within_alignment.py failed: Possible problem before this step or with Python on server."
         fi
     else
-        echo "UNIQFILTER,FAIL,Step 2: Assemblytics_uniq_len_filter.py failed: Possible problem with Python or Python packages on server." >> $LOG_FILE
+        echo "BETWEEN,FAIL,Step 2: Assemblytics_between_alignments.pl failed: Possible problem with Perl or show-coords on server." 
     fi
 else
-    echo "DELTAFILTER,FAIL,Step 1: delta-filter failed: Not a real delta file." >> $LOG_FILE
+    echo "UNIQFILTER,FAIL,Step 1: Assemblytics_uniq_len_filter.py failed: Possible problem with Python or Python packages on server." 
 fi
-
-echo "Check $OUTPUT_PREFIX.progress.log for errors."
