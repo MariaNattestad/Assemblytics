@@ -81,7 +81,7 @@ then
                 Rscript $PATH_TO_R_SCRIPTS/size_distributions.R $OUTPUT_PREFIX $MINIMUM_SIZE $MAXIMUM_SIZE
 
                 show-coords -rclTH $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta > $OUTPUT_PREFIX.coords
-                show-coords -rclTH $OUTPUT_PREFIX.l$UNIQUE_LENGTH.delta > $OUTPUT_PREFIX.unfiltered.coords
+                show-coords -rclTH $DELTA > $OUTPUT_PREFIX.unfiltered.coords
 
 
                 assembly_stats $OUTPUT_PREFIX.coords > $OUTPUT_PREFIX.Assemblytics_assembly_stats.txt
