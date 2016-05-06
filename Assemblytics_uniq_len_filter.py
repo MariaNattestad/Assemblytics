@@ -19,7 +19,14 @@ def run(args):
     filename = args.delta
     unique_length = args.unique_length
     output_filename = args.out
-    keep_small_uniques = False
+    keep_small_uniques = args.keep_small_uniques
+    if keep_small_uniques:
+        print "Keeping fully unique alignments even if they are below the unique anchor length of", unique_length, "bp"
+    else:
+        print "Discarding all alignments below the unique anchor length of", unique_length, "bp"
+        print "Use --keep_small_uniques to keep all the fully unique alignments even below this length"
+    if unique_length == 10000:
+        print "Use --unique-length X to set the unique anchor length requirement. Default is 10000, such that each alignment must have at least 10000 bp from the query that are not included in any other alignments."
 
     f = open(filename)
     
@@ -302,6 +309,7 @@ def main():
     parser.add_argument("--delta",help="delta file" ,dest="delta", type=str, required=True)
     parser.add_argument("--out",help="output file" ,dest="out", type=str, required=True)
     parser.add_argument("--unique-length",help="The total length of unique sequence an alignment must have on the query side to be retained. Default: 10000" ,dest="unique_length",type=int, default=10000)
+    parser.add_argument("--keep_small_uniques",help="Keep small aligments (below the unique anchor length) if they are completely unique without any part of the alignment mapping multiple places" ,dest="keep_small_uniques",action="store_true")
     parser.set_defaults(func=run)
     args=parser.parse_args()
     args.func(args)
