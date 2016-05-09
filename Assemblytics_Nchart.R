@@ -69,7 +69,6 @@ for (to_png in c(TRUE,FALSE)) {
             ggplot(both.plot, aes(x = NG, y = contig.length, color=contig.source)) + 
                 xlim(0,100) +
                 scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x), labels = trans_format("log10", math_format(10^.x)), limits=c(1,genome.length)) + 
-#                 scale_x_continuous(expand=c(0,0),limits=c(0,100)) +
                 geom_path(size=1.5,alpha=0.5) +
                 geom_point(size=2,alpha=0.5) +
                 labs(x = paste("NG(x)% where 100% = ",bp_format(genome.length), sep=""),y="Sequence length",colour="Assembly",title="Cumulative sequence length") +
@@ -79,7 +78,16 @@ for (to_png in c(TRUE,FALSE)) {
     } else {
         # To make bacterial genomes at least show a dot instead of an error because  
         # they only have 1 contig
-        print(ggplot(both.plot, aes(x = NG, y = contig.length,color=contig.source)) + xlim(0,100) +  geom_point(size=5) + ylim(0,genome.length) + labs(x = paste("NG(x)% where 100% = ",genome.length," bp", sep=""),y="Sequence length",colour="Assembly"))
+        print(
+            ggplot(both.plot, aes(x = NG, y = contig.length, color=contig.source)) + 
+              xlim(0,100) +
+              scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x), labels = trans_format("log10", math_format(10^.x)), limits=c(1,genome.length)) + 
+#               geom_path(size=1.5,alpha=0.5) +
+              geom_point(size=4,alpha=0.5) +
+              labs(x = paste("NG(x)% where 100% = ",bp_format(genome.length), sep=""),y="Sequence length",colour="Assembly",title="Cumulative sequence length") +
+              scale_color_manual(values=colors) +
+              annotation_logticks(sides="lr")
+        )
     }
     dev.off()
 }

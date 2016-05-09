@@ -166,7 +166,7 @@ def run(args):
     current_query_position = 0
     fcoords_out_tab = open(output_filename + ".coords.tab",'w')
     fcoords_out_csv = open(output_filename + ".coords.csv",'w')
-    fcoords_out_csv.write("ref_start,ref_end,query_start,query_end,ref_length,query_length,ref_chrom,query_chrom,tag\n")
+    fcoords_out_csv.write("ref_start,ref_end,query_start,query_end,ref_length,query_length,ref,query,tag\n")
 
 
     # For basic assembly stats:
@@ -174,6 +174,7 @@ def run(args):
     query_sequences = set()
     ref_lengths = []
     query_lengths = []
+
     f_stats_out = open(output_filename + ".Assemblytics_assembly_stats.txt","w")
 
     for line in f:
@@ -203,8 +204,10 @@ def run(args):
             # For basic assembly stats:
             if not current_reference_name in ref_sequences:
                 ref_lengths.append(current_reference_size)
+                ref_sequences.add(current_reference_name)
             if not current_query_name in query_sequences:
                 query_lengths.append(current_query_size)
+                query_sequences.add(current_query_name)
 
         else:
             fields = line.strip().split()
@@ -222,7 +225,7 @@ def run(args):
                     keep_printing = True
                 else:
                     keep_printing = False
-                fcoords_out_csv.write(",".join(map(str,[ref_start,ref_end,query_start, query_end,current_reference_size,current_query_size,current_reference_name,current_query_name,csv_tag])) + "\n")
+                fcoords_out_csv.write(",".join(map(str,[ref_start,ref_end,query_start, query_end,current_reference_size,current_query_size,current_reference_name.replace(",","_"),current_query_name.replace(",","_"),csv_tag])) + "\n")
                 alignment_counter[query] = alignment_counter[query] + 1
 
             elif keep_printing == True:
@@ -236,6 +239,7 @@ def run(args):
     ref_lengths.sort()
     query_lengths.sort()
 
+    # Assembly statistics
     ref_lengths = np.array(ref_lengths)
     query_lengths = np.array(query_lengths)
 
