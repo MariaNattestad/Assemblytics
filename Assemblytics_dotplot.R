@@ -28,6 +28,10 @@ ref.pos <- function(chrom,pos,chr.lengths) {
 
 coords <- read.csv(filename,sep=",",header=TRUE)
 
+if (nrow(coords)>100000) {
+    coords <- coords[1:100000,]
+}
+
 # names(coords) <- c("ref_start", "ref_end","query_start","query_end","ref_length","query_length","ref","query")
 
 
@@ -86,7 +90,9 @@ query.labels[query.lengths < 0.02*sum(as.numeric(query.lengths))] <- ""
 
 theme_set(theme_bw(base_size = 24))
 
-colors <- c("red","black")
+colors <- c("black","red")
+
+coords$tag <- factor(coords$tag,levels=c("unique","repetitive"))
 
 
 

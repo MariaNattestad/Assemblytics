@@ -94,13 +94,28 @@ def SVtable(args):
 
     print "Total number of all variants: %s" % (intWithCommas(overall_total))
     f_output_csv.write("Total for all variants,%s,%s bp\n" % (overall_total,int(overall_total_bases)))
-    print "Total bases affected by all variants: %s bp" % (intWithCommas(int(overall_total_bases)))
+    print "Total bases affected by all variants: %s" % (gig_meg(int(overall_total_bases)))
 
     print "Total number of structural variants: %s" % (intWithCommas(overall_total_SVs))
     f_output_csv.write("Total for all structural variants,%s,%s bp\n" % (overall_total_SVs,int(overall_total_SV_bases))  )
-    print "Total bases affected by structural variants: %s bp" % (intWithCommas(int(overall_total_SV_bases)))
+    print "Total bases affected by structural variants: %s" % (gig_meg(int(overall_total_SV_bases)))
 
     f_output_csv.close()
+
+def gig_meg(number,digits = 2):
+    gig = 1000000000.
+    meg = 1000000.
+    kil = 1000.
+
+    if number > gig:
+        return str(round(number/gig,digits)) + " Gbp"
+    elif number > meg:
+        return str(round(number/meg,digits)) + " Mbp"
+    elif number > kil:
+        return str(round(number/kil,digits)) + " Kbp"
+    else:
+        return str(number) + " bp"
+
 
 def intWithCommas(x):
     if type(x) not in [type(0), type(0L)]:

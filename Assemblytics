@@ -108,6 +108,6 @@ then
         echo "BETWEEN,FAIL,Step 2: Assemblytics_between_alignments.pl failed: Possible problem with Perl or show-coords on server." 
     fi
 else
-    echo "UNIQFILTER,FAIL,Step 1: Assemblytics_uniq_len_filter.py failed: Possible problem with Python or Python packages on server." 
+    echo "UNIQFILTER,FAIL,Step 1: Assemblytics_uniq_anchor.py failed: Possible problem with Python or Python packages on server." 
 fi
 

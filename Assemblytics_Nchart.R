@@ -35,7 +35,14 @@ ref.cumsum <- data.frame(NG=cumsum(ref.data$length/genome.length*100),contig.len
 
 query.cumsum <- data.frame(NG=cumsum(query.data$length/genome.length*100),contig.length=query.data$length,contig.source="Query")
 
+
 both.plot <- rbind(ref.cumsum,query.cumsum)
+
+ref.cumsum.0 <- rbind(data.frame(NG=c(0),contig.length=max(ref.cumsum$contig.length),contig.source="Reference"),ref.cumsum)
+
+query.cumsum.0 <- rbind(data.frame(NG=c(0),contig.length=max(query.cumsum$contig.length),contig.source="Query"),query.cumsum)
+
+with.zeros <- rbind(ref.cumsum.0,query.cumsum.0)
 
 
 
@@ -64,13 +71,13 @@ for (to_png in c(TRUE,FALSE)) {
         pdf(paste(prefix,".Assemblytics.Nchart.pdf",sep=""))
     }
     
-    if (nrow(both.plot) > 2) {
+    if (nrow(with.zeros) > 2) {
         print(
-            ggplot(both.plot, aes(x = NG, y = contig.length, color=contig.source)) + 
+            ggplot(with.zeros, aes(x = NG, y = contig.length, color=contig.source)) + 
                 xlim(0,100) +
                 scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x), labels = trans_format("log10", math_format(10^.x)), limits=c(1,genome.length)) + 
-                geom_path(size=1.5,alpha=0.5) +
-                geom_point(size=2,alpha=0.5) +
+                geom_path(size=1.5,alpha=0.5) + 
+                geom_point(data=both.plot,size=2,alpha=0.5) + 
                 labs(x = paste("NG(x)% where 100% = ",bp_format(genome.length), sep=""),y="Sequence length",colour="Assembly",title="Cumulative sequence length") +
                 scale_color_manual(values=colors) +
                 annotation_logticks(sides="lr")
