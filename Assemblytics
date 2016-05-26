@@ -54,7 +54,7 @@ echo "${OUTPUT_PREFIX##*/}"
 echo "STARTING,DONE,Starting unique anchor filtering."
 
 >&2 echo "1. Filter delta file"
-Assemblytics_uniq_anchor.py --delta $DELTA --unique-length $UNIQUE_LENGTH --out $OUTPUT_PREFIX
+Assemblytics_uniq_anchor.py --delta $DELTA --unique-length $UNIQUE_LENGTH --keep-small-uniques --out $OUTPUT_PREFIX
 if [ -e $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta.gz ];
 then
     echo "UNIQFILTER,DONE,Step 1: Assemblytics_uniq_anchor.py completed successfully. Now finding variants between alignments." 

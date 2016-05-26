@@ -80,7 +80,7 @@ for (to_png in c(TRUE,FALSE)) {
                 geom_point(data=both.plot,size=2,alpha=0.5) + 
                 labs(x = paste("NG(x)% where 100% = ",bp_format(genome.length), sep=""),y="Sequence length",colour="Assembly",title="Cumulative sequence length") +
                 scale_color_manual(values=colors) +
-                annotation_logticks(sides="lr")
+                annotation_logticks(sides="lr",color="black")
               )
     } else {
         # To make bacterial genomes at least show a dot instead of an error because  
