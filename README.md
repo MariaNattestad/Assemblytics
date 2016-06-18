@@ -1,4 +1,4 @@
-# Assemblytics - an analytics tool for the detection and analysis of assembly-based variants
+# Assemblytics: a web analytics tool for the detection of variants from an assembly 
 
 Assemblytics is available online at http://qb.cshl.edu/assemblytics/
 
