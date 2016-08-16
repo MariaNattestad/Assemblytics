@@ -1,14 +1,17 @@
 # Assemblytics: a web analytics tool for the detection of variants from an assembly 
 
-Assemblytics is available online at http://qb.cshl.edu/assemblytics/
+Assemblytics is available online at http://assemblytics.com
 
-Please cite our pre-print on the bioRxiv: http://biorxiv.org/content/early/2016/03/20/044925
+Please cite our paper in Bioinformatics: http://www.ncbi.nlm.nih.gov/pubmed/27318204
 
-If you would like a stand-alone version (for instance to comply with rules preventing upload of data to a third-party website), this repository contains all the code for running Assemblytics yourself, from unique anchor filtering and calling variants to creating the output plots and summary tables. 
+If you prefer to run Assemblytics from the command-line this repository contains all the code, from unique anchor filtering and calling variants to creating the output plots and summary tables. 
 
-To run Assemblytics, simply copy all the scripts in this repository into your path and make them executable (chmod +x script_name) if necessary.
+The whole web application can also be downloaded and run locally, utilizing the graphical user interface and giving the added benefit of the interactive dot plot which is only available in the web version: https://github.com/marianattestad/assemblytics_web
 
-Follow the instructions at http://qb.cshl.edu/assemblytics/ for how to prepare your data and get a delta file for Assemblytics. 
+
+To run Assemblytics on the command-line, simply copy all the scripts in this repository into your path and make them executable (chmod +x script_name) if necessary.
+
+Follow the instructions at http://assemblytics.com for how to prepare your data and get a delta file for Assemblytics. 
 
 Then run as:
 ```
