@@ -95,7 +95,7 @@ for (to_png in c(TRUE,FALSE)) {
                     }
 
                     print(ggplot(filtered_bed,aes(x=size, fill=type)) + 
-                      geom_bar(binwidth=binwidth) + 
+                      geom_histogram(binwidth=binwidth) + 
                       scale_fill_manual(values=big_palette,drop=FALSE) + 
                       facet_grid(type ~ .,drop=FALSE) + 
                       labs(fill="Variant type",x="Variant size",y="Count",title=paste("Variants",comma_format(min_var),"to", comma_format(max_var),"bp")) + 
