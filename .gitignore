@@ -1,0 +1,10 @@
+user_data/*
+!user_data/.htaccess
+user_uploads/*
+!user_uploads/.htaccess
+
+
+*.delta
+python_env
+reproducibility
+
