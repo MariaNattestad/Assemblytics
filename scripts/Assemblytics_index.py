@@ -1,9 +1,7 @@
 #! /usr/bin/env python
 
 # Author: Maria Nattestad
-# Email: mnattest@cshl.edu
-# This script is part of Assemblytics, a program to detect and analyze structural variants from an assembly aligned to a reference genome using MUMmer. 
-
+# github.com/marianattestad/assemblytics
 
 
 import argparse
@@ -95,10 +93,7 @@ def run(args):
                     sum_forward += alignment_length
         # orientation:
         flip_by_query[query_name] = sum_reverse > sum_forward
-        # for ref in amount_of_reference:
-            # if amount_of_reference[ref] > 0:
-                # references_by_query[query_name].add(ref)
-                # queries_by_reference[ref].add(query_name)
+
         # ordering
         if len(ref_position_scores) > 0:
             relative_ref_position_by_query.append((query_name,np.median(ref_position_scores)))
@@ -110,6 +105,7 @@ def run(args):
 
     fout_ref_index = open(output_prefix + ".ref.index",'w')
     fout_ref_index.write("ref,ref_length,matching_queries\n")
+
     # reference_lengths is sorted by the reference chromosome name
     for ref,ref_length in reference_lengths:
         fout_ref_index.write("%s,%d,%s\n" % (ref,ref_length,"~".join(queries_by_reference[ref])))
@@ -117,6 +113,7 @@ def run(args):
 
     fout_query_index = open(output_prefix + ".query.index",'w')
     fout_query_index.write("query,query_length,matching_refs\n")
+
     # relative_ref_position_by_query is sorted by rel_pos
     for query,rel_pos in relative_ref_position_by_query:
         fout_query_index.write("%s,%d,%s\n" % (query,query_lengths[query],"~".join(references_by_query[query])))
@@ -130,7 +127,7 @@ def run(args):
     fout.write(header+",alignment_length\n") # copy the header
 
     alignment_length_column = len(header.split(","))
-    # sorted_by_alignment_length = []
+
     uniques = []
     repetitives = []
 

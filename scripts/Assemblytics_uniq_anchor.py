@@ -1,19 +1,13 @@
 #! /usr/bin/env python
 
-
 # Author: Maria Nattestad
-# Email: mnattest@cshl.edu
-# This script is part of Assemblytics, a program to detect and analyze structural variants from an assembly aligned to a reference genome using MUMmer. 
-
+# github.com/marianattestad/assemblytics
 
 import argparse
 import gzip
-# from intervaltree import *
 import time
-
 import numpy as np
 import operator
-
 
 
 def run(args):
@@ -34,7 +28,8 @@ def run(args):
     
     f = open(filename)
     header1 = f.readline()
-    if header1[0:4]=="\x1f\x8b\x08\x08":
+    # the first two bytes show whether a file is gzipped
+    if header1[0:2]=="\x1f\x8b":
         f.close()
         f = gzip.open(filename)
         print f.readline().strip()
@@ -74,18 +69,8 @@ def run(args):
                 query_min = min([int(fields[2]),int(fields[3])])
                 query_max = max([int(fields[2]),int(fields[3])])
 
-                ##########  TESTING ONLY  ###########
-                # lines_by_query[current_query_name] = (query_min,query_max)
-                # test_list = test_list + [(query_min,query_max)]
-                #####################################
-
                 lines_by_query[current_query_name].append((query_min,query_max))
                 header_lines_by_query[current_query_name].append(current_header)
-        # linecounter += 1
-        # if linecounter % 10000000 == 0:
-        #     print "%d,%f" % (linecounter, time.time()-last)
-        #     last = time.time()
-        
 
     f.close()
 
@@ -106,30 +91,6 @@ def run(args):
     query_counter = 0
 
     for query in lines_by_query:
-
-        ################   TESTING    ####################   
-
-        # results_intervaltree = summarize_intervaltree(lines_by_query[query], unique_length_required = unique_length)
-        # intervaltree_filtered_out = set(range(0,len(lines_by_query[query]))) - set(results_intervaltree)
-    
-        # results_planesweep = summarize_planesweep(lines_by_query[query], unique_length_required = unique_length) 
-        # planesweep_filtered_out = set(range(0,len(lines_by_query[query]))) - set(results_planesweep)
-        # if intervaltree_filtered_out == planesweep_filtered_out :
-        #     num_matches += 1
-        # else:
-        #     num_mismatches += 1
-        #     print "MISMATCH:"
-        #     print "number of alignments:", len(lines_by_query[query])
-        #     print "results_intervaltree:"
-        #     print results_intervaltree
-        #     for i in results_intervaltree:
-        #         print lines_by_query[query][i]
-        #     print "results_planesweep:"
-        #     print results_planesweep
-        #     for i in results_planesweep:
-        #         print lines_by_query[query][i]
-        ################   TESTING    ####################
-
         alignments_to_keep[query] = summarize_planesweep(lines_by_query[query], unique_length_required = unique_length,keep_small_uniques=keep_small_uniques)
 
         query_counter += 1
@@ -140,13 +101,11 @@ def run(args):
     print "Deciding which alignments to keep: %d seconds for %d queries" % (time.time()-before,num_queries)
     before = time.time()
 
-
     fout = gzip.open(output_filename + ".Assemblytics.unique_length_filtered_l%d.delta.gz" % (unique_length),'w')
     
-
     f = open(filename)
     header1 = f.readline()
-    if header1[0:4]=="\x1f\x8b\x08\x08":
+    if header1[0:2]=="\x1f\x8b":
         f.close()
         f = gzip.open(filename)
         header1 = f.readline()
@@ -304,7 +263,6 @@ def intWithCommas(x):
 def summarize_planesweep(lines,unique_length_required, keep_small_uniques=False):
 
     alignments_to_keep = []
-    # print len(lines)
 
     # If no alignments:
     if len(lines)==0:
@@ -325,28 +283,13 @@ def summarize_planesweep(lines,unique_length_required, keep_small_uniques=False)
 
 
     sorted_starts_and_stops = sorted(starts_and_stops,key=operator.itemgetter(0))
-    # print sorted_starts_and_stops
 
     current_coverage = 0
     last_position = -1
-    # sorted_unique_intervals = []
     sorted_unique_intervals_left = []
     sorted_unique_intervals_right = []
     for pos,change in sorted_starts_and_stops:
-        # print sorted_starts_and_stops[i]
-        # pos = sorted_starts_and_stops[i][0]
-        # change = sorted_starts_and_stops[i][1]
-        
-        # print pos,change
-        # First alignment only:
-        # if last_position == -1:
-        #     last_position = pos
-        #     continue
-
-        # print last_position,pos,current_coverage
-
         if current_coverage == 1:
-            # sorted_unique_intervals.append((last_position,pos))
             sorted_unique_intervals_left.append(last_position)
             sorted_unique_intervals_right.append(pos)
 
@@ -370,18 +313,14 @@ def summarize_planesweep(lines,unique_length_required, keep_small_uniques=False)
             sum_uniq += sorted_unique_intervals_right[i] - sorted_unique_intervals_left[i]
             i += 1
 
-        # print query_min,query_max,sum_uniq
         if sum_uniq >= unique_length_required:
             alignments_to_keep.append(linecounter)
         elif keep_small_uniques == True and exact_match == True:
             alignments_to_keep.append(linecounter)
-            # print "Keeping small alignment:", query_min, query_max
-            # print sorted_unique_intervals_left[i-1],sorted_unique_intervals_right[i-1]
 
         linecounter += 1
 
     return alignments_to_keep
-
 
 
 def binary_search(query, numbers, left, right):
@@ -399,54 +338,6 @@ def binary_search(query, numbers, left, right):
     else: # if query > numbers[mid]:
         return binary_search(query,numbers,mid+1,right)
 
-
-# def summarize_intervaltree(lines, unique_length_required):
-
-#     alignments_to_keep = []
-#     # print len(lines)
-
-#     if len(lines)==0:
-#         return alignments_to_keep
-
-#     if len(lines) == 1:
-#         if abs(lines[0][1] - lines[0][0]) >= unique_length_required:
-#             return [0]
-
-
-#     starts_and_stops = []
-#     for query_min,query_max in lines:
-#         starts_and_stops.append((query_min,query_max))
-
-#     # build full tree
-#     tree = IntervalTree.from_tuples(starts_and_stops) 
-    
-
-#     # for each interval (keeping the same order as the lines in the input file)
-#     line_counter = 0
-#     for query_min,query_max in lines:
-        
-#         # create a tree object from the current interval
-#         this_interval = IntervalTree.from_tuples([(query_min,query_max)])
-
-#         # create a copy of the tree without this one interval
-#         rest_of_tree = tree - this_interval
-
-#         # find difference between this interval and the rest of the tree by subtracting out the other intervals one by one
-#         for other_interval in rest_of_tree:
-#             this_interval.chop(other_interval.begin, other_interval.end)
-        
-#         # loop through to count the total number of unique basepairs
-#         total_unique_length = 0
-#         for sub_interval in this_interval:
-#             total_unique_length += sub_interval.end - sub_interval.begin
-
-#         # if the total unique length is above our threshold, add the index to the list we are reporting       
-#         if total_unique_length >= unique_length_required:
-#             alignments_to_keep.append(line_counter)
-#         line_counter += 1
-
-
-#     return alignments_to_keep
 
 
 def main():

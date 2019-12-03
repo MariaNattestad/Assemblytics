@@ -1,17 +1,15 @@
-library(ggplot2)
+# Author: Maria Nattestad
+# github.com/marianattestad/assemblytics
 
+library(ggplot2)
 
 args<-commandArgs(TRUE)
 prefix <- args[1]
-
-
 
 filename <- paste(prefix,".oriented_coords.csv",sep="")
 plot.output.filename <- paste(prefix,".Assemblytics.Dotplot_filtered",sep="")
 
 plot.title <- "Dot plot of Assemblytics filtered alignments"
-
-
 
 ref.pos <- function(chrom,pos,chr.lengths) {
     
@@ -96,7 +94,7 @@ coords$tag <- factor(coords$tag,levels=c("unique","repetitive"))
 
 
 
-#  CREATE PNG
+# CREATE PNG
 png(file=paste(plot.output.filename, ".png",sep=""),width=1000,height=1000)    
 print(ggplot(coords, aes(x=ref.loc.start,xend=ref.loc.stop,y=query.loc.start,yend=query.loc.stop,color=tag)) + geom_segment(lineend="butt",size=1.5) + labs(x="Reference",y="Query",title=plot.title) + scale_y_continuous(breaks = cumsum(as.numeric(query.lengths)),labels=query.labels,expand=c(0,0), limits = c(0,sum(as.numeric(query.lengths)))) + scale_x_continuous(breaks = cumsum(as.numeric(chr.lengths)),labels=chr.labels,expand=c(0,0),limits=c(0,sum(as.numeric(chr.lengths)))) + scale_color_manual(values=colors,name="Filter") + theme(
     axis.ticks.y=element_line(size=0),
@@ -109,21 +107,3 @@ print(ggplot(coords, aes(x=ref.loc.start,xend=ref.loc.stop,y=query.loc.start,yen
 ))
 
 dev.off()
-
-#  CREATE PDF
-# pdf(file=paste(plot.output.filename, ".pdf",sep=""),width=100,height=100,res=100)
-# print(ggplot(coords, aes(x=ref.loc.start,xend=ref.loc.stop,y=query.loc.start,yend=query.loc.stop)) + geom_segment(lineend="butt",size=1.5) + labs(x="Reference",y="Query",title=plot.title) + scale_y_continuous(breaks = cumsum(as.numeric(query.lengths)),labels=query.labels,expand=c(0,0), limits = c(0,sum(as.numeric(query.lengths)))) + scale_color_manual(values=colors) + scale_x_continuous(breaks = cumsum(as.numeric(chr.lengths)),labels=chr.labels,expand=c(0,0),limits=c(0,sum(as.numeric(chr.lengths)))) + theme(
-#     axis.ticks.y=element_line(size=0),
-#     axis.text.x = element_text(angle = 90, hjust = 1,vjust=-0.5),
-#     axis.text.y = element_text(size=12,vjust=1.1),
-#     plot.title = element_text(vjust=3),
-#     panel.grid.major.x = element_line(colour = "black",size=0.1), 
-#     panel.grid.major.y = element_line(colour = "black",size=0.1), 
-#     panel.grid.minor = element_line(NA)
-# ))
-# 
-# dev.off()
-
-
-
-

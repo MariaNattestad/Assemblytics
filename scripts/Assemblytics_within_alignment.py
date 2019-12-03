@@ -1,10 +1,10 @@
 #! /usr/bin/env python
-import argparse
 
-import gzip
 # Author: Maria Nattestad
-# Email: mnattest@cshl.edu
-# This script is part of Assemblytics, a program to detect and analyze structural variants from an assembly aligned to a reference genome using MUMmer. 
+# github.com/marianattestad/assemblytics
+
+import argparse
+import gzip
 
 
 def run(args):
@@ -13,7 +13,8 @@ def run(args):
 
     f = open(filename)
     header1 = f.readline()
-    if header1[0:4]=="\x1f\x8b\x08\x08":
+    # check first 2 bytes to see if the file is gzipped
+    if header1[0:2]=="\x1f\x8b":
         f.close()
         f = gzip.open(filename)
         header1 = f.readline()
@@ -33,20 +34,15 @@ def run(args):
 
     for line in f:
         if line[0]==">":
-            # linecounter += 1
-            # if linecounter > 1:
-            #     break
             fields = line.strip().split()
             current_reference_name = fields[0][1:]
             current_query_name = fields[1]
         else:
             fields = line.strip().split()
             if len(fields) > 4:
-                # current_reference_position = int(fields[0])
-                current_reference_position = min(int(fields[0]),int(fields[1]))
+                current_reference_position = min(int(fields[0]), int(fields[1]))
                 # fields[1] is the reference position at the end of the alignment
-                # current_query_position = int(fields[2])
-                current_query_position = min(int(fields[2]),int(fields[3]))
+                current_query_position = min(int(fields[2]), int(fields[3]))
                 # fields[3] is the query position at the end of the alignment
             else:
                 tick = int(fields[0])
@@ -66,29 +62,22 @@ def run(args):
                     current_query_position += abs(tick) - 1 
                     if tick > 0:
                         size = 1
-                        # report = "%s\t%d\t%d\tAssemblytics_%d\t%d\t%s\t%s\t%d\t%d\t%s\t%s\n" % (current_reference_name,current_reference_position,current_reference_position+size,len(variants)+1,size,"+","Deletion",size,0,current_query_name,"within_alignment")
                         report = [current_reference_name,current_reference_position,current_reference_position+size,"Assemblytics_w_"+str(len(variants)+1),size,"+","Deletion",size,0,current_query_name,"within_alignment",current_query_position,current_query_position]
                         current_reference_position += size # update reference position after deletion
                         variants.append(report)
                     elif tick < 0:
                         size = 1
-                        # report = "%s\t%d\t%d\tAssemblytics_%d\t%d\t%s\t%s\t%d\t%d\t%s\t%s\n" % (current_reference_name,current_reference_position,current_reference_position,len(variants)+1,size,"+","Insertion",0,size,current_query_name,"within_alignment")
                         report = [current_reference_name,current_reference_position,current_reference_position,"Assemblytics_w_"+str(len(variants)+1),size,"+","Insertion",0,size,current_query_name,"within_alignment",current_query_position,current_query_position+size]
                         current_query_position += size # update query position after insertion
                         variants.append(report)
-                # TESTING
-                # print line, report
-                
 
     f.close()
 
     newcounter = 1
     for line in variants:
-        # report = "%s\t%d\t%d\tAssemblytics_%d\t%d\t%s\t%s\t%d\t%d\t%s\t%s\n" % line
         if line[4] >= minimum_variant_size:
             line[3] = "Assemblytics_w_%d" % (newcounter)
             print "\t".join(map(str,line[0:10])) + ":" + str(line[11]) + "-" + str(line[12]) + ":+\t" + line[10]
-            # print "\t".join(map(str,line))
             newcounter += 1
 
 
