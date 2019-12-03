@@ -7,7 +7,6 @@
 import argparse
 import numpy as np
 import re
-import operator
 
 
 def run(args):

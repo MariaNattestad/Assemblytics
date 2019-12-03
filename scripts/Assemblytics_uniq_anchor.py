@@ -277,7 +277,6 @@ def summarize_planesweep(lines,unique_length_required, keep_small_uniques=False)
 
     starts_and_stops = []
     for query_min,query_max in lines:
-        # print query_min, query_max
         starts_and_stops.append((query_min,"start"))
         starts_and_stops.append((query_max,"stop"))
 
