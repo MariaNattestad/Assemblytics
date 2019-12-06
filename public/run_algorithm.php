@@ -3,7 +3,7 @@
         
 <?php
 
-    if( !isset($_POST['code']) ) { echo shell_exec('echo ERROR: No code passed to run_algorithm.php >> user_data/ERRORS/run_algorithm.log');}
+    if( !isset($_POST['code']) ) { echo shell_exec('echo ERROR: No run ID passed to run_algorithm.php >> user_data/ERRORS/run_algorithm.log');}
     $code=$_POST["code"];
     if( !isset($_POST['nickname']) ) { echo shell_exec('echo ERROR: No nickname passed to run_algorithm.php >> user_data/$code/run_algorithm.log');}
     if( !isset($_POST['uniqlength']) ) { echo shell_exec('echo ERROR: No uniqlength passed to run_algorithm.php >> user_data/$code/run_algorithm.log');} 
@@ -18,8 +18,8 @@
     $oldmask = umask(0);
     mkdir("user_data/$code");
     umask($oldmask);
-    
-    echo shell_exec("./Assemblytics $filename user_data/$code/$nickname $uniqlength $min_size $max_size &> user_data/$code/run_algorithm_errors.log &"); 
+
+    echo shell_exec("../scripts/Assemblytics $filename user_data/$code/$nickname $uniqlength $min_size $max_size &> user_data/$code/run_algorithm_errors.log &");
 
     $new_dataset = array( "date"=>time(), "codename"=>$code, "description"=> $nickname );
 

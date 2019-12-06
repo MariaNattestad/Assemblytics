@@ -1,10 +1,11 @@
-user_data/*
-!user_data/.htaccess
-user_uploads/*
-!user_uploads/.htaccess
+public/user_data/*
+!public/user_data/.htaccess
+public/user_uploads/*
+!public/user_uploads/.htaccess
 
 
 *.delta
+!public/sample.delta
 python_env
 reproducibility
 
