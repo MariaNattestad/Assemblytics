@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-
 # Author: Maria Nattestad
 # Email: mnattest@cshl.edu
 # This script is part of Assemblytics, a program to detect and analyze structural variants from an assembly aligned to a reference genome using MUMmer. 
 
+from __future__ import print_function
 
 import argparse
 import numpy as np
@@ -13,8 +13,7 @@ def SVtable(args):
     filename = args.file
     minimum_variant_size = args.minimum_variant_size
     maximum_variant_size = args.maximum_variant_size
-    simplify_types = False 
-
+    simplify_types = False
 
     f=open(filename)
     typeList = []
