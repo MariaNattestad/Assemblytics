@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 # Author: Maria Nattestad
 # github.com/marianattestad/assemblytics
 

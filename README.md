@@ -26,15 +26,18 @@ Important: Use only contigs rather than scaffolds from the assembly. This will p
 ## Command-line instructions
 If you prefer to run Assemblytics from the command-line the scripts/ directory contains all the code you need, from unique anchor filtering and calling variants to creating the output plots and summary tables. 
 
-
-To run Assemblytics on the command-line, simply copy all the scripts from the `scripts/` directory into your PATH and make them executable (chmod +x script_name) if necessary.
+To run Assemblytics on the command-line, keep all the scripts together inside the `scripts/` directory, either in your PATH or anywhere else you like, and make them all executable:
+```
+chmod a+x scripts/Assemblytics*
+```
+Keeping the scripts together in the same folder will allow the main `Assemblytics` script to call all the other scripts that do filtering, analysis, indexing, and plotting.
 
 Follow the instructions at http://assemblytics.com for how to prepare your data and get a delta file for Assemblytics. 
 
 Then run Assemblytics:
 
 ```
-Assemblytics <delta_file> <output_prefix> <unique_anchor_length> <min_variant_size> <max_variant_size>
+scripts/Assemblytics <delta_file> <output_prefix> <unique_anchor_length> <min_variant_size> <max_variant_size>
 ```
 
 ## Local web app instructions

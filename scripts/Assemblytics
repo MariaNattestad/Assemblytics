@@ -41,7 +41,6 @@ if [ -z "$5" ]
     exit
 fi
 
-
 DELTA=${1?"$USAGE"}
 OUTPUT_PREFIX=${2?"$USAGE"}
 UNIQUE_LENGTH=${3?"$USAGE"}
@@ -54,27 +53,40 @@ MAXIMUM_SIZE=${5?"$USAGE"}
 >&2 echo Minimum variant size to call: $MINIMUM_SIZE
 >&2 echo Maximum variant size to call: $MAXIMUM_SIZE
 
+
+mkdir -p ${OUTPUT_PREFIX%/*}/
+
 # In the web application, this log file is used to show status updates in the GUI
 LOG_FILE=${OUTPUT_PREFIX%/*}/progress.log
->&2 echo "Logging progress updates in LOG_FILE"
+>&2 echo "Logging progress updates in $LOG_FILE"
+
+SCRIPT_PATH=$(dirname $BASH_SOURCE)
+echo 'script path:' $SCRIPT_PATH
+
+# Check that Rscript is available (needed by R scripts)
+if [ -z $(which Rscript) ]; then
+    >&2 echo "Error: No Rscript executable available in PATH: $PATH."
+    exit
+fi
+
 
 echo "${OUTPUT_PREFIX##*/}" >> $LOG_FILE
 
 echo "STARTING,DONE,Starting unique anchor filtering." >> $LOG_FILE
 
 >&2 echo "1. Filter delta file"
-Assemblytics_uniq_anchor.py --delta $DELTA --unique-length $UNIQUE_LENGTH --out $OUTPUT_PREFIX --keep-small-uniques
+$SCRIPT_PATH/Assemblytics_uniq_anchor.py --delta $DELTA --unique-length $UNIQUE_LENGTH --out $OUTPUT_PREFIX --keep-small-uniques
 if [ -e $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta.gz ];
 then
     echo "UNIQFILTER,DONE,Step 1: Assemblytics_uniq_anchor.py completed successfully. Now finding variants between alignments." >> $LOG_FILE
     >&2 echo "2. Finding variants between alignments"
-    Assemblytics_between_alignments.pl $OUTPUT_PREFIX.coords.tab $MINIMUM_SIZE $MAXIMUM_SIZE all-chromosomes exclude-longrange bed > $OUTPUT_PREFIX.variants_between_alignments.bed
+    $SCRIPT_PATH/Assemblytics_between_alignments.pl $OUTPUT_PREFIX.coords.tab $MINIMUM_SIZE $MAXIMUM_SIZE all-chromosomes exclude-longrange bed > $OUTPUT_PREFIX.variants_between_alignments.bed
 
     if [ -e $OUTPUT_PREFIX.variants_between_alignments.bed ];
     then
         echo "BETWEEN,DONE,Step 2: Assemblytics_between_alignments.pl completed successfully. Now finding variants within alignments." >> $LOG_FILE
         >&2 echo "3. Finding variants within alignments"
-        Assemblytics_within_alignment.py --delta $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta.gz --min $MINIMUM_SIZE > $OUTPUT_PREFIX.variants_within_alignments.bed
+        $SCRIPT_PATH/Assemblytics_within_alignment.py --delta $OUTPUT_PREFIX.Assemblytics.unique_length_filtered_l$UNIQUE_LENGTH.delta.gz --min $MINIMUM_SIZE > $OUTPUT_PREFIX.variants_within_alignments.bed
 
         if [ -e $OUTPUT_PREFIX.variants_within_alignments.bed ];
         then
@@ -87,18 +99,18 @@ then
             then 
                 echo "COMBINE,DONE,Step 4: Variants combined successfully. Now generating figures and summary statistics." >> $LOG_FILE
                 
-                Rscript Assemblytics_variant_charts.R $OUTPUT_PREFIX $MINIMUM_SIZE $MAXIMUM_SIZE
+                $SCRIPT_PATH/Assemblytics_variant_charts.R $OUTPUT_PREFIX $MINIMUM_SIZE $MAXIMUM_SIZE
 
-                Assemblytics_index.py -coords $OUTPUT_PREFIX.coords.csv -out $OUTPUT_PREFIX
+                $SCRIPT_PATH/Assemblytics_index.py -coords $OUTPUT_PREFIX.coords.csv -out $OUTPUT_PREFIX
                 
-                Rscript Assemblytics_dotplot.R $OUTPUT_PREFIX
+                $SCRIPT_PATH/Assemblytics_dotplot.R $OUTPUT_PREFIX
 
                 cat $OUTPUT_PREFIX.coords.tab | awk '{print $7,$5}' OFS='\t' | sort | uniq | sort -k2,2nr >  $OUTPUT_PREFIX.coords.ref.genome
                 cat $OUTPUT_PREFIX.coords.tab | awk '{print $8,$6}' OFS='\t' | sort | uniq | sort -k2,2nr >  $OUTPUT_PREFIX.coords.query.genome
                 
-                Rscript Assemblytics_Nchart.R $OUTPUT_PREFIX
+                $SCRIPT_PATH/Assemblytics_Nchart.R $OUTPUT_PREFIX
                 
-                Assemblytics_summary.py -i $OUTPUT_PREFIX.Assemblytics_structural_variants.bed -min $MINIMUM_SIZE -max $MAXIMUM_SIZE > $OUTPUT_PREFIX.Assemblytics_structural_variants.summary
+                $SCRIPT_PATH/Assemblytics_summary.py -i $OUTPUT_PREFIX.Assemblytics_structural_variants.bed -min $MINIMUM_SIZE -max $MAXIMUM_SIZE > $OUTPUT_PREFIX.Assemblytics_structural_variants.summary
 
                 # zip up results for quick download of all results
                 zip $OUTPUT_PREFIX.Assemblytics_results.zip $OUTPUT_PREFIX.Assemblytics*
