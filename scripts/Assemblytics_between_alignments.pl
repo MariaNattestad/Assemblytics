@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
-# Authors: Maria Nattestad and Mike Schatz
-# Email: mnattest@cshl.edu
+# Originally by Mike Schatz, modified by Maria Nattestad
+# github.com/marianattestad/assemblytics
 
 use strict;
 my @chromosome_filter_choices =  ("all-chromosomes","primary-chromosomes");
@@ -17,22 +17,14 @@ my $chromosome_filter = shift @ARGV or die $USAGE;
 my $longrange_filter = shift @ARGV or die $USAGE;
 my $output_file = shift @ARGV or die $USAGE;
 
-
-
 # How close do alignments have to be in order to call deletions and insertions? (as opposed to contractions and expansions)
 my $narrow_threshold = 50;
-
-
 
 # Number of basepairs of distance in either the reference or the query before we call an SV long-range
 my $longrange = $maximum_event_size;
 
-
-
 # What is the longest two alignments can map apart in the query before we throw the variant between them away?
 my $max_query_dist = 100000;
-
-
 
 my %chromosome_filter_choices_hash = map { $_, 1 } @chromosome_filter_choices;
 my %longrange_filter_choices_hash = map { $_, 1 } @longrange_filter_choices;
@@ -48,15 +40,7 @@ if ($longrange_filter ne "exclude-longrange" && $output_file eq "bed"){
   die "Cannot output bed while allowing long-range variants\n$USAGE";
 }
 
-# open COORDS, "./bin/show-coords -rclHT $deltafile |"
-#   or die "Can't process $deltafile ($!)\n";
-
 open COORDS, "$coordsfile"  or die "Can't process $coordsfile ($!)\n";
-
-##open COORDS, "show-coords -rclHT $deltafile |"
-##  or die "Can't process $deltafile ($!)\n";
-
-
 
 ## Require the flanking alignments are at least this long to call an SV
 ## Note there is no minimum length for fusions, this is determined by how 
@@ -117,31 +101,6 @@ foreach my $qid (sort keys %alignments) # query name is the key for the alignmen
   my @refs = sort keys %{$alignments{$qid}}; # grab all alignments of that query
   my $numref = scalar @refs;
 
-  ## scan for fusions
-  # if ($numref > 1) # if query aligns to multiple chromosomes
-  # {
-  #   my $allrefs = join " ", @refs; # join the names together for output
-
-  #   print "== $qid [$numref] $allrefs\n"; # output the names of the chromosomes 
-  #   $candidatefusions++;
-
-  #   my $rcnt = 0;
-  #   foreach my $rid (@refs)
-  #   {
-  #     print "--\n" if ($rcnt > 0);
-  #     $rcnt++;
-
-  #     foreach my $a (@{$alignments{$qid}->{$rid}})
-  #     {
-  #       my $str = $a->{"str"};
-  #       print "$str\n";
-  #     }
-  #   }
-
-  #   print "\n";
-  # }
-
-
   ## Resort the alignments by query sort position
   my @qaligns;
   foreach my $rid (@refs)
@@ -172,12 +131,6 @@ foreach my $qid (sort keys %alignments) # query name is the key for the alignmen
 
       my $istr = $ai->{"str"};
       my $jstr = $aj->{"str"};
-
-      # if ($ai->{"rid"} ne $aj->{"rid"})
-      # {
-      #   ## skip the fusions for now #############################################################################################
-      #   next;
-      # }
 
       my $rid = $ai->{"rid"};
 
@@ -361,20 +314,7 @@ foreach my $qid (sort keys %alignments) # query name is the key for the alignmen
               $typeguess = "None";
             }
           }
-          # my $ratio; 
-          # if ($qdist != 0){
-          # #   $ratio = abs(($rdist/$qdist)-1);
-          # #   if ($ratio < 0.1) {
-          # #     $typeguess = "Equilibrium";
-          # #   }
-            #   if ($rdist==$qdist || abs($qdist) > $longrange) {
-            #     $typeguess = "None";
-            #   }
-          # }
         }
-
-# my @chromosome_filter_choices = ("all-chromosomes","primary-chromosomes");
-# my @longrange_filter_choices = ("include-longrange","exclude-longrange");
 
         my $chromi_length = length $chromi; # length of the chromosome names: a way to filter to primary chromosomes and cut out alts and patches from the assembly
         my $chromj_length = length $chromj;
@@ -398,43 +338,9 @@ foreach my $qid (sort keys %alignments) # query name is the key for the alignmen
               }
             }
           }
-          #if ($filter_type ~~ ("primary-allsizes","primary-shortrange") {
-           # && $typeguess ne "Interchromosomal" && $typeguess ne "Inversion" && $chromi_length < 6 && $chromj_length < 6 && $abs_event_size >= $minimum_event_size) {
         }
         $candidatesvs++;
-        #push @{$svstats{$svtype}}, $totaldist;
       }
     }
   }
 }
-
-
-
-# print "Processed $numalignments alignments found $candidatefusions fusions and $candidatesvs SVs\n";
-# print STDERR "Processed $numalignments alignments found $candidatefusions fusions and $candidatesvs SVs\n";
-
-# foreach my $svtype (keys %svstats)
-# {
-#   my @events = @{$svstats{$svtype}};
-#   my $cnt = scalar @events;
-
-#   my $sum = 0.0;
-#   foreach my $e (@events)
-#   {
-#     $sum += $e;
-#   }
-
-#   my $mean = sprintf ("%0.02f", $sum/$cnt);
-
-#   print "svtype[$svtype]: $cnt $mean\n";
-#   print STDERR "svtype[$svtype]: $cnt $mean\n";
-# }
-
-
-
-
-
-
-
-
-
