@@ -34,8 +34,6 @@ comma_format<-function(num) {
     formatC(abs(num),format="f",big.mark=",",drop0trailing = TRUE)
 }
 
-
-
 # Prep data for log-scaled plot
 alt <- bed
 

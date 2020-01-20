@@ -12,16 +12,21 @@ def run(args):
     filename = args.delta
     minimum_variant_size = args.minimum_variant_size
 
-    f = open(filename)
-    header1 = f.readline()
-    # check first 2 bytes to see if the file is gzipped
-    if header1[0:2]=="\x1f\x8b":
-        f.close()
-        f = gzip.open(filename)
-        header1 = f.readline()
-    
+    try:
+        f = gzip.open(filename, 'rt')
+        header1 = f.readline().strip()
+        print("Detected gzipped delta file. Reading...")
+    except:
+        f = open(filename, 'r')
+        header1 = f.readline().strip()
+        print("Detected uncompressed delta file. Reading...")
+   
     # Ignore the first two lines for now
-    f.readline()
+    print("\n")
+    print("Header (2 lines):")
+    print(header1)
+    print(f.readline().strip())
+    print("\n")
 
     linecounter = 0
 
@@ -74,18 +79,20 @@ def run(args):
 
     f.close()
 
+    fout = open(args.output_path, 'w')
     newcounter = 1
     for line in variants:
         if line[4] >= minimum_variant_size:
             line[3] = "Assemblytics_w_%d" % (newcounter)
-            print("\t".join(map(str,line[0:10])) + ":" + str(line[11]) + "-" + str(line[12]) + ":+\t" + line[10])
+            fout.write("\t".join(map(str,line[0:10])) + ":" + str(line[11]) + "-" + str(line[12]) + ":+\t" + line[10] + "\n")
             newcounter += 1
-
+    fout.close()
 
 def main():
     parser=argparse.ArgumentParser(description="Outputs MUMmer coordinates annotated with length of unique sequence for each alignment")
     parser.add_argument("--delta",help="delta file" ,dest="delta", type=str, required=True)
     parser.add_argument("--min",help="Minimum size (bp) of variant to include, default = 50" ,dest="minimum_variant_size",type=int, default=50)
+    parser.add_argument("--output", help="Output file with variants in bed format.", dest="output_path", type=str, required=True)
     parser.set_defaults(func=run)
     args=parser.parse_args()
     args.func(args)
