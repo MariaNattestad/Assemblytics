@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
 # Author: Maria Nattestad
 # github.com/marianattestad/assemblytics
 
@@ -125,19 +123,21 @@ then
                     echo "SUMMARY,DONE,Step 5: Assemblytics_summary.py completed successfully" >> $LOG_FILE
                 else
                     echo "SUMMARY,FAIL,Step 5: Assemblytics_summary.py failed" >> $LOG_FILE
+                    exit 1
                 fi
-            
             else
                 echo "COMBINE,FAIL,Step 4: combining variants failed" >> $LOG_FILE
+                exit 1
             fi
         else
-
             echo "WITHIN,FAIL,Step 3: Assemblytics_within_alignment.py failed: Possible problem before this step or with Python on server." >> $LOG_FILE
+            exit 1
         fi
     else
         echo "BETWEEN,FAIL,Step 2: Assemblytics_between_alignments.pl failed: Possible problem with Perl or show-coords on server." >> $LOG_FILE
+        exit 1
     fi
 else
     echo "UNIQFILTER,FAIL,Step 1: Assemblytics_uniq_anchor.py failed: Possible problem with Python or Python packages on server." >> $LOG_FILE
+    exit 1
 fi
-
