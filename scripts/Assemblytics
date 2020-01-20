@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # Author: Maria Nattestad
 # github.com/marianattestad/assemblytics
 

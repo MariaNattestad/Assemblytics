@@ -12,16 +12,21 @@ def run(args):
     filename = args.delta
     minimum_variant_size = args.minimum_variant_size
 
-    f = open(filename)
-    header1 = f.readline()
-    # check first 2 bytes to see if the file is gzipped
-    if header1[0:2]=="\x1f\x8b":
-        f.close()
-        f = gzip.open(filename)
-        header1 = f.readline()
-    
+    try:
+        f = gzip.open(filename, 'rt')
+        header1 = f.readline().strip()
+        print("Detected gzipped delta file. Reading...")
+    except:
+        f = open(filename, 'r')
+        header1 = f.readline().strip()
+        print("Detected uncompressed delta file. Reading...")
+   
     # Ignore the first two lines for now
-    f.readline()
+    print("\n")
+    print("Header (2 lines):")
+    print(header1)
+    print(f.readline().strip())
+    print("\n")
 
     linecounter = 0
 

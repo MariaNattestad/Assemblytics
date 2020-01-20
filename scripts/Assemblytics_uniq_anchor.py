@@ -25,21 +25,21 @@ def run(args):
     if unique_length == 10000:
         print("Use --unique-length X to set the unique anchor length requirement. Default is 10000, such that each alignment must have at least 10000 bp from the query that are not included in any other alignments.")
 
-
-    print("header:")
-    
-    f = open(filename)
-    header1 = f.readline()
-    # the first two bytes show whether a file is gzipped
-    if header1[0:2]=="\x1f\x8b":
-        f.close()
-        f = gzip.open(filename)
-        print(f.readline().strip())
-    else:
-        print(header1.strip())
-    
+    try:
+        f = gzip.open(filename, 'rt')
+        header1 = f.readline().strip()
+        print("Detected gzipped delta file. Reading...")
+    except:
+        f = open(filename, 'r')
+        header1 = f.readline().strip()
+        print("Detected uncompressed delta file. Reading...")
+   
     # Ignore the first two lines for now
+    print("\n")
+    print("Header (2 lines):")
+    print(header1)
     print(f.readline().strip())
+    print("\n")
 
     linecounter = 0
 
@@ -56,7 +56,6 @@ def run(args):
 
     for line in f:
         if line[0]==">":
-
             fields = line.strip().split()
             current_query_name = fields[1]
             current_header = line.strip()
@@ -84,9 +83,9 @@ def run(args):
     num_queries = len(lines_by_query)
     print("Filtering alignments of %d queries" % (num_queries))
     
-    num_query_step_to_report = num_queries/100
+    num_query_step_to_report = int(num_queries/100)
     if num_queries < 100:
-        num_query_step_to_report = num_queries/10
+        num_query_step_to_report = int(num_queries/10)
     if num_queries < 10:
         num_query_step_to_report = 1
 
@@ -97,22 +96,24 @@ def run(args):
 
         query_counter += 1
         if (query_counter % num_query_step_to_report) == 0:
-            print("Progress: %d%%" % (query_counter*100/num_queries))
+            print("Progress: %d%%" % (int(query_counter*100/num_queries)))
     print("Progress: 100%")
 
     print("Deciding which alignments to keep: %d seconds for %d queries" % (time.time()-before,num_queries))
     before = time.time()
 
-    fout = gzip.open(output_filename + ".Assemblytics.unique_length_filtered_l%d.delta.gz" % (unique_length),'w')
+    fout = gzip.open(output_filename + ".Assemblytics.unique_length_filtered_l%d.delta.gz" % (unique_length),'wt')
     
-    f = open(filename)
-    header1 = f.readline()
-    if header1[0:2]=="\x1f\x8b":
-        f.close()
-        f = gzip.open(filename)
-        header1 = f.readline()
-        
-    fout.write(header1) # write the first line that we read already
+    try:
+        f = gzip.open(filename, 'rt')
+        header1 = f.readline().strip()
+        print("Detected gzipped delta file. Reading...")
+    except:
+        f = open(filename, 'r')
+        header1 = f.readline().strip()
+        print("Detected uncompressed delta file. Reading...")
+
+    fout.write(header1)
     fout.write(f.readline())
     
     linecounter = 0
@@ -329,7 +330,7 @@ def binary_search(query, numbers, left, right):
     
     if left >= right:
         return right
-    mid = (right+left)/2
+    mid = int((right+left)/2)
     
 
     if query == numbers[mid]:
