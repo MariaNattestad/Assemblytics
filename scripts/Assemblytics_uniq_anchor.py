@@ -106,11 +106,11 @@ def run(args):
     
     try:
         f = gzip.open(filename, 'rt')
-        header1 = f.readline().strip()
+        header1 = f.readline()
         print("Detected gzipped delta file. Reading...")
     except:
         f = open(filename, 'r')
-        header1 = f.readline().strip()
+        header1 = f.readline()
         print("Detected uncompressed delta file. Reading...")
 
     fout.write(header1)
