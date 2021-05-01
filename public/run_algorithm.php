@@ -4,15 +4,15 @@
 <?php
 
     if( !isset($_POST['code']) ) { echo shell_exec('echo ERROR: No run ID passed to run_algorithm.php >> user_data/ERRORS/run_algorithm.log');}
-    $code=$_POST["code"];
+    $code=escapeshellarg($_POST["code"]);
     if( !isset($_POST['nickname']) ) { echo shell_exec('echo ERROR: No nickname passed to run_algorithm.php >> user_data/$code/run_algorithm.log');}
     if( !isset($_POST['uniqlength']) ) { echo shell_exec('echo ERROR: No uniqlength passed to run_algorithm.php >> user_data/$code/run_algorithm.log');} 
     if( !isset($_POST['min_size']) ) { echo shell_exec('echo ERROR: No min_size passed to run_algorithm.php >> user_data/$code/run_algorithm.log');} 
     if( !isset($_POST['max_size']) ) { echo shell_exec('echo ERROR: No max_size passed to run_algorithm.php >> user_data/$code/run_algorithm.log');} 
-    $nickname = $_POST["nickname"];
-    $uniqlength = $_POST["uniqlength"];
-    $min_size = $_POST["min_size"];
-    $max_size = $_POST["max_size"];
+    $nickname = escapeshellarg($_POST["nickname"]);
+    $uniqlength = escapeshellarg($_POST["uniqlength"]);
+    $min_size = escapeshellarg($_POST["min_size"]);
+    $max_size = escapeshellarg($_POST["max_size"]);
     $url="analysis.php?code=$code";
     $filename="user_uploads/$code";
     $oldmask = umask(0);
