@@ -20,7 +20,7 @@ def run(args):
         f = open(filename, 'r')
         header1 = f.readline().strip()
         print("Detected uncompressed delta file. Reading...")
-   
+
     # Ignore the first two lines for now
     print("\n")
     print("Header (2 lines):")
@@ -49,6 +49,14 @@ def run(args):
                 current_reference_position = min(int(fields[0]), int(fields[1]))
                 # fields[1] is the reference position at the end of the alignment
                 current_query_position = min(int(fields[2]), int(fields[3]))
+                #############################################################
+                align_start = current_query_position ## for this issue
+                align_end = max(int(fields[2]), int(fields[3])) ## for this issue
+                if int(fields[2]) > int(fields[3]):
+                    strand = "-"
+                else:
+                    strand = "+"
+                #############################################################
                 # fields[3] is the query position at the end of the alignment
             else:
                 tick = int(fields[0])
@@ -64,16 +72,50 @@ def run(args):
                         report[12] = report[12] + 1 # query end position
                         current_query_position += 1 # update query position after insertion
                 else: # report the last one and continue
-                    current_reference_position += abs(tick) - 1 
-                    current_query_position += abs(tick) - 1 
+                    current_reference_position += abs(tick) - 1
+                    current_query_position += abs(tick) - 1
                     if tick > 0:
                         size = 1
-                        report = [current_reference_name,current_reference_position,current_reference_position+size,"Assemblytics_w_"+str(len(variants)+1),size,"+","Deletion",size,0,current_query_name,"within_alignment",current_query_position,current_query_position]
+                        report = [  ## easy to read
+                            current_reference_name,
+                            current_reference_position,
+                            current_reference_position+size,
+                            "Assemblytics_w_"+str(len(variants)+1),
+                            size,
+                            "+",
+                            "Deletion",
+                            size,
+                            0,
+                            current_query_name,
+                            "within_alignment",
+                            current_query_position,
+                            current_query_position,
+                            strand, ## add strand
+                            align_start, ## add alignment start
+                            align_end ## add alignment end
+                            ]
                         current_reference_position += size # update reference position after deletion
                         variants.append(report)
                     elif tick < 0:
                         size = 1
-                        report = [current_reference_name,current_reference_position,current_reference_position,"Assemblytics_w_"+str(len(variants)+1),size,"+","Insertion",0,size,current_query_name,"within_alignment",current_query_position,current_query_position+size]
+                        report = [  ## easy to read
+                            current_reference_name,
+                            current_reference_position,
+                            current_reference_position,
+                            "Assemblytics_w_"+str(len(variants)+1),
+                            size,
+                            "+",
+                            "Insertion",
+                            0,
+                            size,
+                            current_query_name,
+                            "within_alignment",
+                            current_query_position,
+                            current_query_position+size,
+                            strand, ## add strand
+                            align_start, ## add alignment start
+                            align_end ## add alignment end
+                            ]
                         current_query_position += size # update query position after insertion
                         variants.append(report)
 
@@ -83,8 +125,23 @@ def run(args):
     newcounter = 1
     for line in variants:
         if line[4] >= minimum_variant_size:
+
+            strand = line[13]
+            raw_query_pos = line[11]
+            raw_query_pos_add_size = line[12]
+
+            align_start = line[14]
+            align_end = line[15]
+
+            if strand == "-":
+                query_coord_start = align_start+align_end-raw_query_pos_add_size+2
+                query_coord_end = align_start+align_end-raw_query_pos+2
+            else:
+                query_coord_start = raw_query_pos
+                query_coord_end = raw_query_pos_add_size
+
             line[3] = "Assemblytics_w_%d" % (newcounter)
-            fout.write("\t".join(map(str,line[0:10])) + ":" + str(line[11]) + "-" + str(line[12]) + ":+\t" + line[10] + "\n")
+            fout.write("\t".join(map(str,line[0:10])) + ":" + str(query_coord_start) + "-" + str(query_coord_end) + f":{strand}\t" + line[10] + "\n")  ## fill with: query_coord_start;query_coord_end;strand
             newcounter += 1
     fout.close()
 
@@ -99,4 +156,3 @@ def main():
 
 if __name__=="__main__":
     main()
-
