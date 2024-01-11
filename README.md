@@ -11,7 +11,31 @@ There are three ways to use Assemblytics:
 2. Run it from the command-line. For this you need only the contents of the `scripts/` directory. See instructions below.
 3. Run the full web app from a local server. See instructions below.
 
+
+## Input instructions
+IMPORTANT: Assemblytics has been configured to work only with MUMmer3 and using the following alignment instructions. Running Assemblytics with any other delta file as input may give errors or miscallibrated results.
+
+Upload a delta file to analyze alignments of an assembly to another assembly or a reference genome
+
+1. Download and install [MUMmer 3](https://sourceforge.net/projects/mummer/files/)
+2. Align your assembly to a reference genome using nucmer (from MUMmer package)
+```bash
+nucmer -maxmatch -l 100 -c 500 REFERENCE.fa ASSEMBLY.fa -prefix OUT
+# Settings above are important for unique anchor filtering to work correctly in Assemblytics.
+```
+Consult the [MUMmer 3 manual](https://mummer.sourceforge.net/manual/) if you encounter problems.
+
+3. Optional: Gzip the delta file to speed up upload (usually 2-4X faster)
+```
+gzip OUT.delta
+```
+Then use the OUT.delta.gz file for upload.
+
+4. Upload the .delta or delta.gz file (view example) to Assemblytics
+
 Important: Use only contigs rather than scaffolds from the assembly. This will prevent false positives when the number of Ns in the scaffolded sequence does not match perfectly to the distance in the reference.
+
+The unique sequence length required represents an anchor for determining if a sequence is unique enough to safely call variants from, which is an alternative to the mapping quality filter for read alignment.
 
 ## Dependencies
 - R
