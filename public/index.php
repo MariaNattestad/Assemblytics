@@ -23,7 +23,7 @@
             <p><pre>$ gzip OUT.delta</pre>
               Then use the OUT.delta.gz file for upload.
             </p></li>
-          <li>Upload the .delta or delta.gz file (<a href="public/sample.delta" target="_blank">view example</a>) to Assemblytics</li>
+          <li>Upload the .delta or delta.gz file (<a href="sample.delta" target="_blank">view example</a>) to Assemblytics</li>
         </ol>
         <p>
           Important: Use only contigs rather than scaffolds from the assembly. This will prevent false positives when the number of Ns in the scaffolded sequence does not match perfectly to the distance in the reference. 
