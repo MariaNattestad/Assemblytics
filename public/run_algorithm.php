@@ -1,6 +1,3 @@
-<html>
-    <body>
-        
 <?php
 
     if( !isset($_POST['code']) ) { echo shell_exec('echo ERROR: No run ID passed to run_algorithm.php >> user_data/ERRORS/run_algorithm.log');}
@@ -20,7 +17,7 @@
     mkdir("user_data/$code");
     umask($oldmask);
 
-    echo shell_exec("../scripts/Assemblytics $filename user_data/$code/$nickname $uniqlength $min_size $max_size &> user_data/$code/run_algorithm_errors.log &");
+    shell_exec("../scripts/Assemblytics $filename user_data/$code/$nickname $uniqlength $min_size $max_size &> user_data/$code/run_algorithm_errors.log &");
 
     $new_dataset = array( "date"=>time(), "codename"=>$code, "description"=> $nickname );
 
@@ -35,7 +32,3 @@
 
     header('Location: '.$url);
 ?>
-    </body>
-</html>
-
-<!-- <form name="input_code_form" action="run.php" id="analysis_form" method="post"> -->
