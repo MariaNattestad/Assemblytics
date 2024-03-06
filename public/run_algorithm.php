@@ -17,7 +17,7 @@
     mkdir("user_data/$code");
     umask($oldmask);
 
-    shell_exec("../scripts/Assemblytics $filename user_data/$code/$nickname $uniqlength $min_size $max_size &> user_data/$code/run_algorithm_errors.log &");
+    shell_exec("../scripts/Assemblytics $filename user_data/$code/$nickname $uniqlength $min_size $max_size > /dev/null 2>&1 ");
 
     $new_dataset = array( "date"=>time(), "codename"=>$code, "description"=> $nickname );
 
