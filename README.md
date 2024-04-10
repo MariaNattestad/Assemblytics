@@ -37,7 +37,8 @@ Important: Use only contigs rather than scaffolds from the assembly. This will p
 
 The unique sequence length required represents an anchor for determining if a sequence is unique enough to safely call variants from, which is an alternative to the mapping quality filter for read alignment.
 
-## Dependencies
+## Running Assemblytics locally
+### Dependencies
 - R
     - ggplot2
     - plyr
@@ -47,7 +48,7 @@ The unique sequence length required represents an anchor for determining if a se
     - argparse
     - numpy
 
-## Command-line instructions
+### Command-line instructions
 If you prefer to run Assemblytics from the command-line the scripts/ directory contains all the code you need, from unique anchor filtering and calling variants to creating the output plots and summary tables. 
 
 To run Assemblytics on the command-line, keep all the scripts together inside the `scripts/` directory, either in your PATH or anywhere else you like, and make them all executable:
@@ -64,11 +65,22 @@ Then run Assemblytics:
 scripts/Assemblytics <delta_file> <output_prefix> <unique_anchor_length> <min_variant_size> <max_variant_size>
 ```
 
-## Local web app instructions
-The whole web application can be downloaded and run locally, utilizing the graphical user interface and giving the added benefit of the interactive dot plot which is only available in the web version and cannot run from the CLI.
+### Local web app instructions
 
-Notes for installation:
+It is technically possible to install Assemblytics as a web app locally, but I do not recommend this because it is not a very straight-forward process, so unless you're quite familiar with setting up a local web server, you're probably better off using [assemblytics.com](assemblytics.com) or the command-line instructions above.
+
+Here are a few pointers if you choose to make an attempt though:
 - Use a local server like [Apache](https://www.apachefriends.org/download.html) and follow the instructions there.
 - Clone this repository into a folder called `assemblytics`, to make the `.htaccess` file point the server correctly to the `public/` folder, where the index.php and other pages and web app resources are located.
 - Make sure to open up permissions in user_uploads and user_data so the webserver can read and write there. 
 - It does not contain the examples as some of these are huge files.
+
+## FAQ
+
+**Can I use this delta file that I already have with other nucmer parameters or that is already filtered?**
+
+This is not recommended because Assemblytics does its own "unique anchor filtering" that relies on being able to see all the unfiltered alignments to analyze which regions of the reference are unique enough to anchor the alignments. Following the instructions above, in particular using `nucmer -maxmatch` without any additional filter steps, is the only method I can recommend because it is how I built and tested Assemblytics. For genomes like human that may have delta files larger than 10 MB, you can run nucmer with `-l 10000` instead of `-l 100`.
+
+**Why are the alignments or variants I see are not showing up in the Assemblytics results?**
+
+First, the unique anchor filtering in Assemblytics might be filtering out some of the alignments. Second, Assemblytics only catalogues the gaps between alignments and the larger within-alignment insertions and deletions that are in the delta file. To see where they came from, if they are between-alignments, you should see the edges of alignments bordering those locations. If they are within-alignments you can see them by using the `show-aligns` command in MUMmer.
