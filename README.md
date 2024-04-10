@@ -2,6 +2,12 @@
 
 Assemblytics is available online at http://assemblytics.com
 
+> :warning: Assemblytics is pretty outdated at this point, made around 2015 when no other assembly-based variant callers were available and I needed one for my own research. Since then the use of genome assembly has exploded and many more tools are available for downstream variant calling from assemblies, like [SVIM-asm](https://github.com/eldariont/svim-asm).
+> Given it's been 8 years since I published Assemblytics, and I haven't worked with genome assemblies since then, I'm not in a great position to answer your questions, compare Assemblytics' results to other tools,  or provide scientific support, but I have done my best to keep it up and running online for those who continue to rely on it.
+> Feel free to use the github issues here to share your favorite alternative assembly-based variant callers.
+> Good luck with your research! 🙏 Maria
+
+
 Please cite our paper in Bioinformatics: http://www.ncbi.nlm.nih.gov/pubmed/27318204
 
 The preprint is still freely available on the BioRxiv: https://www.biorxiv.org/content/10.1101/044925v1
