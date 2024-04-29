@@ -40,7 +40,7 @@ coords$query <- as.character(coords$query)
 
 
 
-ordered_common_chromosome_names <- c(seq(1,100),paste("chr",seq(1,100),sep=""),paste("Chr",seq(1,100),sep=""),c("X","Y","M","MT","Chr0","chr0","0"))
+ordered_common_chromosome_names <- c(seq(1,100),paste("chr",seq(1,100),sep=""),paste("Chr",seq(1,100),sep=""),paste("scaffold_",seq(1,100),sep=""),paste("contig_",seq(1,100),sep=""),c("X","Y","M","MT","Chr0","chr0","0"))
 
 all_chromosomes_some_ordered <- c(intersect(ordered_common_chromosome_names,unique(coords$ref)),setdiff(unique(coords$ref),ordered_common_chromosome_names))
 
