@@ -1,10 +1,11 @@
 # This script automatically deletes old user data to free up space on the server.
 
-# Run with crontab: `crontab -e`:
+# Run with crontab: `sudo crontab -e`:
 # 0 0 * * 1 /bin/bash /var/www/assemblytics/scripts/autodelete_old_data.sh
-# Set the permissions on user_data and user_uploads to allow the cron job to delete files:
-# sudo chmod -R 755 user_data
-# sudo chmod -R 755 user_uploads
+
+# To show what commands were run (with script name and line numbers!):
+PS4='+ ${BASH_SOURCE}:${LINENO}: '
+set -xuo pipefail
 
 # Set the timezone to Pacific time
 export TZ="America/Los_Angeles"
