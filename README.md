@@ -1,22 +1,17 @@
 # Assemblytics: a web analytics tool for the detection of variants from an assembly 
 
-Assemblytics is available online at http://assemblytics.com
-
 > :warning: Assemblytics is pretty outdated at this point, made around 2015 when no other assembly-based variant callers were available and I needed one for my own research. Since then the use of genome assembly has exploded and many more tools are available for downstream variant calling from assemblies, like [SVIM-asm](https://github.com/eldariont/svim-asm) and [SyRI](https://github.com/schneebergerlab/syri).
-> Given it's been 8 years since I published Assemblytics, and I haven't worked with genome assemblies since then, I'm not in a great position to answer your questions, compare Assemblytics' results to other tools,  or provide scientific support, but I have done my best to keep it up and running online for those who continue to rely on it.
+> Given it's been 8 years since I published Assemblytics, and I haven't worked with genome assemblies since then, I'm not in a great position to answer your questions, compare Assemblytics' results to other tools,  or provide scientific support. I did manage to keep it running until late 2024 when server issues finally made it intractable to keep maintaining it.
 > Feel free to use the github issues here to share your favorite alternative assembly-based variant callers.
-> Good luck with your research! 🙏 Maria
+> Good luck with your research! 🙏 Maria 2024
 
+We recorded a podcast episode discussing the challenge of maintaining academic software including some more back story on Assemblytics: [https://youtu.be/eyd7Cb7ueNg?si=LvFMAIG6A8fDPrma](https://youtu.be/eyd7Cb7ueNg?si=LvFMAIG6A8fDPrma).
 
-Please cite our paper in Bioinformatics: http://www.ncbi.nlm.nih.gov/pubmed/27318204
+[![YouTube video of Academic software podcast episode from the OMGenomics Podcast](https://img.youtube.com/vi/eyd7Cb7ueNg/0.jpg)](https://www.youtube.com/watch?v=eyd7Cb7ueNg)
+
+If you used Assemblytics, please cite our paper in Bioinformatics: http://www.ncbi.nlm.nih.gov/pubmed/27318204
 
 The preprint is still freely available on the BioRxiv: https://www.biorxiv.org/content/10.1101/044925v1
-
-There are three ways to use Assemblytics:
-1. Use the hosted online version at http://assemblytics.com. This is the easiest option.
-2. Run it from the command-line. For this you need only the contents of the `scripts/` directory. See instructions below.
-3. Run the full web app from a local server. See instructions below.
-
 
 ## Input instructions
 IMPORTANT: Assemblytics has been configured to work only with MUMmer3 and using the following alignment instructions. Running Assemblytics with any other delta file as input may give errors or miscallibrated results.
@@ -54,7 +49,8 @@ The unique sequence length required represents an anchor for determining if a se
     - numpy
 
 ## Command-line instructions
-If you prefer to run Assemblytics from the command-line the scripts/ directory contains all the code you need, from unique anchor filtering and calling variants to creating the output plots and summary tables. 
+
+To run Assemblytics from the command-line the scripts/ directory contains all the code you need, from unique anchor filtering and calling variants to creating the output plots and summary tables. 
 
 To run Assemblytics on the command-line, keep all the scripts together inside the `scripts/` directory, either in your PATH or anywhere else you like, and make them all executable:
 ```
@@ -62,7 +58,7 @@ chmod a+x scripts/Assemblytics*
 ```
 Keeping the scripts together in the same folder will allow the main `Assemblytics` script to call all the other scripts that do filtering, analysis, indexing, and plotting.
 
-Follow the instructions at http://assemblytics.com for how to prepare your data and get a delta file for Assemblytics. 
+Follow the instructions above ("input instructions") for how to prepare your data and get a delta file for Assemblytics. 
 
 Then run Assemblytics:
 
